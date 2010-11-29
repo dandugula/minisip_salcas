@@ -257,13 +257,13 @@ SipMessage::SipMessage(string &buildFrom)
 			cerr << "WARNING: Length of content was shorter than expected (" << clen <<"!="<<(int)contentbuf.length()<<")"<<endl;
 		}
 		MRef<SipHeader*> h = getHeaderOfType(SIP_HEADER_TYPE_CONTENTTYPE);
-		if (h){	
+		if (h){
 			string contentType = ((SipHeaderValueString*)*(h->getHeaderValue(0) ))->getString();
 //			string b = (SipHeaderValueContentType*)*(h->getHeaderValue(0) )->getParameter("boundary");
 //cerr <<"boundary="<< b <<endl;
 			SipMessageContentFactoryFuncPtr contentFactory = contentFactories.getFactory( contentType );
 			if (contentFactory){
-				MRef<SipMessageContent*> smcref = contentFactory(contentbuf, contentType );
+				MRef<SipMessageContent*> smcref = contentFactory(contentbuf, h->getHeaderValue(0)->getStringWithParameters() );
 				setContent( smcref );
 			}else{
 				setContent( new SipMessageContentUnknown( contentbuf, contentType ));

@@ -55,49 +55,37 @@ SipMessageContentMime::SipMessageContentMime(std::string content, std::string t)
 	std::string cont;
 	this->uniqueboundry = "_Minisip";
 	if(t.substr(0,9) == "multipart"){
-		this->ContentType = t.substr(0 , ContentType.find("; ",0) );
-		index2 = t.find("; boundary=",0);
+		this->ContentType = t.substr(0 , t.find(";",0));
+		index2 = t.find(";boundary=",0);
 		massert(index2 != string::npos);
-		this->boundry = t.substr(index2 + 11 , t.find(";",index2 + 11));
-		// Find first bodypart
-		index2 = content.find("--"+this->boundry, 0);
-		massert(index2 != string::npos);
-		// Extract preamble if any
-		if(index2 > 0)
-			this->Message = content.substr(0, index2 - 5);
-		else
-			this->Message = "";
-		// Extract the bodyparts
-		size_t boundrysize = 2 + this->boundry.length();
-		// Find end of body
-		size_t endindex = content.rfind("--"+this->boundry+"--", content.length());
-		size_t index1 = index2;
-		while (endindex != index1){
-			index1 = index1 + boundrysize + 2;
-			if (content.substr(index1,2) == "\r\n"){
-				cont = "text/plain; charset=us-ascii";
-				index1 = index1 + 2;
-			}
-			else {
-				if (content.substr(index1,14) == "Content-type: ")
-					cont = content.substr(index1+14, content.find("\r\n\r\n", index1 + 14) - index1 - 14);
-				else{
-					cont = "";
-					cerr <<  "Absence of Content-type in MIMEContent.cxx" << endl;
-				}
-			}
-			// Find the end of the bodypart
-			
-			index2 = content.find("--"+this->boundry, index1) - 5;
-			index1 = content.find("\r\n\r\n", index1 + 14) + 4;		
-			SipMessageContentFactoryFuncPtr contentFactory = SipMessage::contentFactories.getFactory( cont);
-			if (contentFactory)
-				addPart(contentFactory(content.substr(index1,index2-index1+1), cont));
-			else //TODO: Better error handling
-				merr << "WARNING: No SipMessageContentFactory found for content type "<<cont <<endl;
-			//End of one bodypart becomes beginning of the next
-			index1 = index2 + 5;	
-		}
+		this->boundry = t.substr(index2 + 10 , t.find(";",index2 + 10));
+
+		this->Message = "";
+		size_t index1 = 0;
+		string part = "";
+
+		// Find and add first bodypart
+		part = "application/sdp";
+		index1 = content.find(part, 0) + part.length() + 2; //hack ;)
+		index2 = content.find("--"+this->boundry, index1) - 4;
+
+		cont=part;
+		SipMessageContentFactoryFuncPtr contentFactory = SipMessage::contentFactories.getFactory(cont);
+		addPart(contentFactory(content.substr(index1,index2-index1+1), cont));
+
+//		cerr << endl << "part1=" << content.substr(index1,index2-index1+1) << endl;
+
+		// Find and add second bodypart
+		part = "application/resource-lists+xml";
+		index1 = content.find(part, 0) + part.length() + 2; //hack ;)
+		index2 = content.rfind("--"+this->boundry+"--", content.length()) - 2;
+
+		cont=part;
+		contentFactory = SipMessage::contentFactories.getFactory(cont);
+		addPart(contentFactory(content.substr(index1,index2-index1+1), cont));
+
+//		cerr << endl << "part2=" << content.substr(index1,index2-index1+1) << endl;
+
 	}
 	else{
 		this->ContentType = t;

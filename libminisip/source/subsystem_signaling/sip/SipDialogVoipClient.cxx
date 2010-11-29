@@ -48,6 +48,7 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmsip/SipMessageContent.h>
+#include<libmsip/SipMessageContentRCL.h>
 #include<libmutil/stringutils.h>
 #include<libmcrypto/base64.h>
 #include<libmutil/Timestamp.h>
@@ -542,6 +543,8 @@ void SipDialogVoipClient::sendInvite(){
 		
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
+  MRef<SipMessageContentMime *> mysdp = new SipMessageContentMime("multipart/mixed");
+  mysdp->setBoundry("chaitu");
 	if (mediaSession){
 		// Build peer uri used for authentication from remote uri,
 		// but containing user and host only.
@@ -555,6 +558,12 @@ void SipDialogVoipClient::sendInvite(){
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
+/*
+    std::vector<MRef<SdpHeader*> > waste = sdp->getHeaders();
+   for(int ll = 0; ll < waste.size(); ++ll) {
+        std::cerr << "Header: " << waste[ll]->getString() << std::endl;
+    }
+*/
 		if( !sdp ){
 			// FIXME: this most probably means that the
 			// creation of the MIKEY message failed, it 
@@ -568,11 +577,17 @@ void SipDialogVoipClient::sendInvite(){
 		}
 	}
 	
+  mysdp->addPart(dynamic_cast<SipMessageContent*>(*sdp));
+
+  //add the rcl list now
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL("prajwol1@130.229.137.196", "application/resource-lists+xml");
+  //add the rcl part to the sdp packet
+  mysdp->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
 	/* Add the latter to the INVITE message */ // If it exists
 	
 
 //-------------------------------------------------------------------------------------------------------------//
-	inv->setContent( *sdp );
+	inv->setContent(dynamic_cast<SipMessageContent*>(*mysdp));
 //-------------------------------------------------------------------------------------------------------------//
 	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );

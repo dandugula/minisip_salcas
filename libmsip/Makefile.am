@@ -56,6 +56,7 @@ msip_src =           source/SipDialogConfig.cxx \
 		     source/SipMessageContentIM.cxx \
 		     source/SipMessageContentFactory.cxx \
 		     source/SipMessageContentMime.cxx \
+		     source/SipMessageContentRCL.cxx \
 		     source/transactions/SipTransaction.h \
                      source/transactions/SipTransaction.cxx \
 		     source/transactions/SipTransactionNonInviteClient.h \
