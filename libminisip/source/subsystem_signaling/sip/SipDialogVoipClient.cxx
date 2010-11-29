@@ -558,12 +558,7 @@ void SipDialogVoipClient::sendInvite(){
 #ifdef ENABLE_TS
 		ts.save("getSdpOffer");
 #endif
-/*
-    std::vector<MRef<SdpHeader*> > waste = sdp->getHeaders();
-   for(int ll = 0; ll < waste.size(); ++ll) {
-        std::cerr << "Header: " << waste[ll]->getString() << std::endl;
-    }
-*/
+
 		if( !sdp ){
 			// FIXME: this most probably means that the
 			// creation of the MIKEY message failed, it 
@@ -580,6 +575,7 @@ void SipDialogVoipClient::sendInvite(){
   mysdp->addPart(dynamic_cast<SipMessageContent*>(*sdp));
 
   //add the rcl list now
+  //TODO: instead of hard coding get the participant list from the gui
   MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL("prajwol1@130.229.137.196", "application/resource-lists+xml");
   //add the rcl part to the sdp packet
   mysdp->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));

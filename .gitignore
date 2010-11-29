@@ -1,7 +1,8 @@
 # Temporary files
 *~
 *.swp
-
+#Tag file
+tags
 # Documentation
 INSTALL
 
