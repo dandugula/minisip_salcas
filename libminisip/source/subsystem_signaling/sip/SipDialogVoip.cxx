@@ -841,7 +841,6 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
     /* Handle RCL List here */
     if( (Offer->getContentType()).substr(0, 29) == "application/resource-list+xml") {
       /*TODO: parse the packet and send the sip uris to GUI subsystem */
-      std::cerr << "Inside SipDialogVoip::sortMIME" << std::endl;
     }
 
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
