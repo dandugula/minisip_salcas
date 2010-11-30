@@ -32,6 +32,7 @@ using namespace std;
 
 void SMCFCollection::addFactory(string contentType, SipMessageContentFactoryFuncPtr f){
 	factories[contentType] = f;
+  //std::cerr << "___{}{}{" << contentType << std::endl;
 }
 
 SipMessageContentFactoryFuncPtr SMCFCollection::getFactory(const string contentType){
@@ -42,6 +43,7 @@ SipMessageContentFactoryFuncPtr SMCFCollection::getFactory(const string contentT
 	}
 	else
 		str = contentType;
+  //std::cerr << "__>>>>>>___" << str << std::endl;
 	return factories[str];
 }
 

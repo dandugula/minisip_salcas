@@ -49,6 +49,7 @@
 #endif
 
 #include<libminisip/signaling/sip/PresenceMessageContent.h>
+#include<libmsip/SipMessageContentRCL.h>
 #include<libminisip/signaling/conference/ConfMessageRouter.h>
 
 #include<libmutil/dbg.h>
@@ -89,6 +90,7 @@ Sip::Sip(MRef<SipSoftPhoneConfiguration*> pconfig, MRef<SubsystemMedia*> sm){
 	SipMessage::contentFactories.addFactory("application/sdp", sdpSipMessageContentFactory);
 	SipMessage::contentFactories.addFactory("application/mikey", SipMIMEContentFactory);
 	SipMessage::contentFactories.addFactory("application/xpidf+xml", presenceSipMessageContentFactory);
+  SipMessage::contentFactories.addFactory("application/resource-lists+xml", SipRCLContentFactory);
 
 
 
