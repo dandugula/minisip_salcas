@@ -1343,6 +1343,12 @@ bool SipDialogConfVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri
 				part = ((SipMessageContentMime*)*Offer)->popFirstPart();
 			}
 		}
+    /* Handle RCL List here */
+    if( (Offer->getContentType()).substr(0, 29) == "application/resource-list+xml") {
+      /*TODO: parse the packet and send the sip uris to GUI subsystem */
+      std::cerr << "Inside SipDialogConfVoip::sortMIME" << std::endl;
+    }
+
 
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
 			switch (type_){
