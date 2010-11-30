@@ -108,6 +108,7 @@ MRef<SipMessage*> SipMessage::createMessage(string &data){
 	if (n>3   &&    (data[start+0]=='S'||data[start+0]=='s') &&
 			(data[start+1]=='I'||data[start+1]=='i') &&
 			(data[start+2]=='P'||data[start+2]=='p' )){
+    //std::cerr << "SipMessage::createMessage>><<" << data << std::endl;
 		return MRef<SipMessage*>(new SipResponse(data));
 	}else{
 		return new SipRequest(data);

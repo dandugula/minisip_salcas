@@ -82,6 +82,7 @@ SipMessageContentMime::SipMessageContentMime(std::string content, std::string t)
 
 		cont=part;
 		contentFactory = SipMessage::contentFactories.getFactory(cont);
+    //std::cerr << "------------------------------------" << std::endl << content << std::endl<< "-------------------------" << std::endl;
 		addPart(contentFactory(content.substr(index1,index2-index1+1), cont));
 
 //		cerr << endl << "part2=" << content.substr(index1,index2-index1+1) << endl;

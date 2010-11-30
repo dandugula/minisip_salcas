@@ -576,7 +576,7 @@ void SipDialogVoipClient::sendInvite(){
 
   //add the rcl list now
   //TODO: instead of hard coding get the participant list from the gui
-  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL("prajwol1@130.229.137.196", "application/resource-lists+xml");
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL("user@192.16.124.217", "application/resource-lists+xml");
   //add the rcl part to the sdp packet
   mysdp->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
 	/* Add the latter to the INVITE message */ // If it exists
