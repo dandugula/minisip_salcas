@@ -139,8 +139,15 @@ bool SipDialogVoipClient::a2001_start_calling_invite( const SipSMCommand &comman
 		
 		//set an "early" remoteUri ... we will update this later
 		dialogState.remoteUri= command.getCommandString().getParam();
-
-		sendInvite();
+    //std::cerr << "remoteUri: " << dialogState.remoteUri << "********" << std::endl;
+    //std::cerr << "CombinedUri: "<< command.getCommandString().getParam2() << "***********" << std::endl;
+    string user_list = command.getCommandString().getParam2();
+    if(user_list != "") {
+     sendGInvite(user_list);
+     std::cerr << "Sending group invite....." << std::endl;
+    } else {
+    	sendInvite();
+    }
 
 		return true;
 	}else{
@@ -523,14 +530,12 @@ SipDialogVoipClient::SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipIdentity
 
 SipDialogVoipClient::~SipDialogVoipClient(){	
 }
-
-
-void SipDialogVoipClient::sendInvite(){
+void SipDialogVoipClient::sendGInvite(string uri_l){
 	MRef<SipRequest*> inv;
 	string keyAgreementMessage;
 	inv = SipRequest::createSipMessageInvite(
 			dialogState.callId,
-			SipUri(dialogState.remoteUri),
+      dialogState.remoteUri,
 			getDialogConfig()->sipIdentity->getSipUri(),
 			getDialogConfig()->getContactUri(useStun),
 			dialogState.seqNo,
@@ -543,8 +548,8 @@ void SipDialogVoipClient::sendInvite(){
 		
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
-  MRef<SipMessageContentMime *> mysdp = new SipMessageContentMime("multipart/mixed");
-  mysdp->setBoundry("chaitu");
+  MRef<SipMessageContentMime *> rclMIME = new SipMessageContentMime("multipart/mixed");
+  rclMIME->setBoundry("8Yards");
 	if (mediaSession){
 		// Build peer uri used for authentication from remote uri,
 		// but containing user and host only.
@@ -572,18 +577,92 @@ void SipDialogVoipClient::sendInvite(){
 		}
 	}
 	
-  mysdp->addPart(dynamic_cast<SipMessageContent*>(*sdp));
+  rclMIME->addPart(dynamic_cast<SipMessageContent*>(*sdp));
 
   //add the rcl list now
   //TODO: instead of hard coding get the participant list from the gui
-  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL("user@192.16.124.217", "application/resource-lists+xml");
+  /*string temp = "";
+  int i = 1;
+  for(; i < uri_list.size() - 1; ++i) temp += uri_list[i] + ", ";
+  temp += uri_list[i];
+  std::cerr << "temp: " << temp << std::endl;
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(temp, "application/resource-lists+xml");*/
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(uri_l, "application/resource-lists+xml");
   //add the rcl part to the sdp packet
-  mysdp->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
+  rclMIME->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
 	/* Add the latter to the INVITE message */ // If it exists
 	
 
 //-------------------------------------------------------------------------------------------------------------//
-	inv->setContent(dynamic_cast<SipMessageContent*>(*mysdp));
+	inv->setContent(dynamic_cast<SipMessageContent*>(*rclMIME));
+//-------------------------------------------------------------------------------------------------------------//
+	
+	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
+
+//	ts.save( INVITE_END );
+	MRef<SipMessage*> pktr(*inv);
+
+	SipSMCommand scmd(
+			pktr, 
+			SipSMCommand::dialog_layer, 
+			SipSMCommand::transaction_layer
+			);
+	
+	getSipStack()->enqueueCommand(scmd, HIGH_PRIO_QUEUE);
+	setLastInvite(inv);
+
+}
+
+void SipDialogVoipClient::sendInvite(){
+	MRef<SipRequest*> inv;
+	string keyAgreementMessage;
+  //std::vector <string> uri_list = split(dialogState.remoteUri, true, ':', false);
+  //std::cerr << "uri_list[0]: " << uri_list[0] << std::endl;
+	inv = SipRequest::createSipMessageInvite(
+			dialogState.callId,
+			//SipUri(uri_list[0]),
+      dialogState.remoteUri,
+			getDialogConfig()->sipIdentity->getSipUri(),
+			getDialogConfig()->getContactUri(useStun),
+			dialogState.seqNo,
+			getSipStack() ) ;
+
+	addAuthorizations( inv );
+	addRoute( inv );
+
+	/* Get the session description from the Session */
+		
+	//There might be so that there are no SDP. Check!
+	MRef<SdpPacket *> sdp;
+	if (mediaSession){
+		// Build peer uri used for authentication from remote uri,
+		// but containing user and host only.
+		SipUri peer(dialogState.remoteUri);
+		string peerUri = peer.getProtocolId() + ":" + peer.getUserIpString();
+#ifdef ENABLE_TS
+		ts.save("getSdpOffer");
+#endif
+		bool anat =  useAnat;
+		sdp = mediaSession->getSdpOffer( peerUri, anat );
+#ifdef ENABLE_TS
+		ts.save("getSdpOffer");
+#endif
+
+		if( !sdp ){
+			// FIXME: this most probably means that the
+			// creation of the MIKEY message failed, it 
+			// should not happen
+			merr << "Sdp was NULL in sendInvite" << endl;
+			return; 
+		}
+
+		if( !sdp->getSessionLevelAttribute( "group" ).empty() ){
+			inv->addHeader(new SipHeader(new SipHeaderValueRequire("sdp-anat")));
+		}
+	}
+	
+//-------------------------------------------------------------------------------------------------------------//
+	inv->setContent(*sdp);
 //-------------------------------------------------------------------------------------------------------------//
 	
 	inv->getHeaderValueFrom()->setParameter("tag",dialogState.localTag );
@@ -634,6 +713,8 @@ void SipDialogVoipClient::sendInviteOk(){
 	
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
+
+  MRef<SipMessageContentMime *> rclMIME = new SipMessageContentMime("multipart/mixed");
 	if (mediaSession){
 #ifdef ENABLE_TS
 		ts.save("getSdpAnswer");
@@ -652,10 +733,24 @@ void SipDialogVoipClient::sendInviteOk(){
 	}
 	
 	/* Add the latter to the INVITE message */ // If it exists
+	rclMIME->addPart(dynamic_cast<SipMessageContent*>(*sdp));
+
+  //add the rcl list now
+  //TODO: instead of hard coding get the participant list from the gui
+  /*string temp = "";
+  int i = 1;
+  for(; i < uri_list.size() - 1; ++i) temp += uri_list[i] + ", ";
+  temp += uri_list[i];
+  std::cerr << "temp: " << temp << std::endl;
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(temp, "application/resource-lists+xml");*/
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(" ", "application/resource-lists+xml");
+  //add the rcl part to the sdp packet
+  rclMIME->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
+	/* Add the latter to the INVITE message */ // If it exists
 	
 
 //-------------------------------------------------------------------------------------------------------------//
-	ok->setContent( *sdp );
+	ok->setContent( dynamic_cast<SipMessageContent*>(*rclMIME) );
 //-------------------------------------------------------------------------------------------------------------//
 //	/* Get the SDP Answer from the MediaSession */
 //	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();

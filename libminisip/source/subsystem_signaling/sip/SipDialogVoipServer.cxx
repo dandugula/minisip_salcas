@@ -49,6 +49,7 @@
 #include<libmsip/SipHeaderTo.h>
 #include<libmsip/SipMessageContentMime.h>
 #include<libmsip/SipMessageContent.h>
+#include<libmsip/SipMessageContentRCL.h>
 #include<libmutil/stringutils.h>
 #include<libmcrypto/base64.h>
 #include<libmutil/Timestamp.h>
@@ -281,6 +282,7 @@ bool SipDialogVoipServer::a3002_ringing_incall_accept( const SipSMCommand &comma
 		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 		massert( !getLastInvite().isNull() );
+/* TODO add a check if its a group call */
 		sendInviteOk();
 
 		getMediaSession()->start();
@@ -635,6 +637,8 @@ void SipDialogVoipServer::sendInviteOk(){
 
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
+  MRef<SipMessageContentMime *> rclMIME = new SipMessageContentMime("multipart/mixed");
+  rclMIME->setBoundry("8Yards");
 	if (mediaSession){
 #ifdef ENABLE_TS
 		ts.save("getSdpAnswer");
@@ -652,11 +656,15 @@ void SipDialogVoipServer::sendInviteOk(){
 		}
 	}
 	
+  rclMIME->addPart(dynamic_cast<SipMessageContent*>(*sdp));
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL("dummy", "application/resource-lists+xml");
+  rclMIME->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
 	/* Add the latter to the INVITE message */ // If it exists
 	
 
 //-------------------------------------------------------------------------------------------------------------//
-	ok->setContent( *sdp );
+  std::cerr << "**** Modified OK ***" << std::endl;
+	ok->setContent( dynamic_cast<SipMessageContent*>(*rclMIME) );
 //-------------------------------------------------------------------------------------------------------------//
 //	/* Get the SDP Answer from the MediaSession */
 //	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();

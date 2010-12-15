@@ -523,7 +523,10 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 	assert(subsystem=="sip");
 	assert(cmd.getOp()=="invite");//TODO: no assert, return error message instead
 	
-	string user = cmd.getParam();
+  std::vector <string> user_list = split(cmd.getParam(), true, ':', false);
+  //For each user in the user list validate the uri.
+  for(int i = 0; i < user_list.size(); ++i) {
+	string &user = user_list[i];
 	bool gotAtSign;
 //	SipDialogSecurityConfig securityConfig;
 #ifdef ENABLE_TS
@@ -600,16 +603,26 @@ CommandString DefaultDialogHandler::handleCommandResp(string subsystem, const Co
 		user += "@" + id->getSipUri().getIp();
 		id->unlock();
 	}
-
+ }
 	
-	MRef<SipDialogVoip*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf->useSTUN, phoneconf->useAnat, NULL); 
+	//MRef<SipDialogVoip*> voipCall = new SipDialogVoipClient(sipStack, id, phoneconf->useSTUN, phoneconf->useAnat, NULL); 
+	MRef<SipDialogVoip*> voipCall = new SipDialogVoipClient(sipStack, phoneconf->defaultIdentity, phoneconf->useSTUN, phoneconf->useAnat, NULL); 
 
-	MRef<Session *> mediaSession = subsystemMedia->createSession( id, voipCall->getCallId() );
+	//MRef<Session *> mediaSession = subsystemMedia->createSession( id, voipCall->getCallId() );
+	MRef<Session *> mediaSession = subsystemMedia->createSession( phoneconf->defaultIdentity, voipCall->getCallId() );
 	voipCall->setMediaSession( mediaSession );
 
 	sipStack->addDialog(*voipCall);
+  string temp = "";
+  int i = 1;
+  while(i < user_list.size() - 1) {
+    temp += user_list[i] + ", ";
+    ++i;
+  }
+  if(user_list.size() > 1)
+    temp += user_list[i];
 
-	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user);
+	CommandString inv(voipCall->getCallId(), SipCommandString::invite, user_list[0], temp);
 #ifdef ENABLE_TS
 	ts.save( TMP );
 #endif

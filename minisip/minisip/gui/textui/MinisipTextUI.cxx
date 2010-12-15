@@ -858,7 +858,45 @@ void MinisipTextUI::guiExecute(string cmd){
 		inCall=false;
 		delete currentconf;
 	}
+#define SALCAS
+#ifdef SALCAS
+	if ((command.size()>=4) && (command.substr(0,5) == "gcall")){
+		if (command.size()>=6){
+			if (state!="IDLE"){
+				displayMessage("UNIMPLEMENTED - only one call at the time with this UI.", red);
+			}else{
+				//std::vector <string> uri_list = split(command.substr(5), true, ':' , false);
+				string uri_list = trim(command.substr(5));
+        /*string temp = "";
+        int l = 1;
+        while(l < uri_list.size() - 1) {
+				  //displayMessage("Uri: "+uri_list);
+          temp += uri_list[l] + ", ";
+          ++l;
+        }
+        temp += uri_list[l];*/
+				CommandString ginvite("",SipCommandString::invite, uri_list);
+				CommandString resp = callback->handleCommandResp("sip",ginvite);
+				callId = resp.getDestinationId();
+				if (callId=="malformed"){
+					state="IDLE";
+					setPrompt(state);
+					displayMessage("The URI is not a valid SIP URI", red);
+					callId="";
 
+				}else{
+					state="TRYING";
+					setPrompt(state);
+					displayMessage(string("Created call with id=")+callId);    
+				}
+			}
+		}else{
+			displayMessage("Usage: call <userid>");
+//			displayHelp("call");
+		}
+		handled=true;
+	}
+#endif /* SALCAS */
 	if ((command.size()>=4) && (command.substr(0,4) == "call")){
 		if (command.size()>=6){
 			if (state!="IDLE"){
@@ -866,13 +904,12 @@ void MinisipTextUI::guiExecute(string cmd){
 			}else{
 				string uri = trim(command.substr(5));
 				displayMessage("Uri: "+uri);
-				
+        /* TODO: (salcas) handling multiple uri's eg: call <user1>, <user2>, ... <usern> */
 				//CONTINUEHERE!!
 				//callId = callback->guicb_doInvite(uri);
 				CommandString invite("",SipCommandString::invite,uri);
 				CommandString resp = callback->handleCommandResp("sip",invite);
 				callId = resp.getDestinationId();
-				
 				if (callId=="malformed"){
 					state="IDLE";
 					setPrompt(state);
