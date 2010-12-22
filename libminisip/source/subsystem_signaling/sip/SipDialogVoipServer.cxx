@@ -734,6 +734,7 @@ void SipDialogVoipServer::sendPrackOk( MRef<SipRequest*> prack ){
 			getDialogConfig()->getContactUri(useStun),
 			-1); //set expires to -1, we do not use it (only in register)
 	ok->addHeader( new SipHeader(*contact) );
+  std::cerr << "$$$$$$$ Sending 200 OK ........." << std::endl;
 
 	sendSipMessage( *ok );
 }

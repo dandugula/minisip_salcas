@@ -99,6 +99,7 @@ class LIBMSIP_API SipDialogState{
 		std::string getRemoteTarget();
 		std::string remoteUri;
 		std::string remoteTarget;
+    std::string gUriList;
 		bool secure;
 		std::list<std::string> routeSet;
 	

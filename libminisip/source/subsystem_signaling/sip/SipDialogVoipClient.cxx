@@ -141,9 +141,9 @@ bool SipDialogVoipClient::a2001_start_calling_invite( const SipSMCommand &comman
 		dialogState.remoteUri= command.getCommandString().getParam();
     //std::cerr << "remoteUri: " << dialogState.remoteUri << "********" << std::endl;
     //std::cerr << "CombinedUri: "<< command.getCommandString().getParam2() << "***********" << std::endl;
-    string user_list = command.getCommandString().getParam2();
-    if(user_list != "") {
-     sendGInvite(user_list);
+    dialogState.gUriList = command.getCommandString().getParam2();
+    if(dialogState.gUriList != "") {
+     sendGInvite();
      std::cerr << "Sending group invite....." << std::endl;
     } else {
     	sendInvite();
@@ -384,7 +384,16 @@ bool SipDialogVoipClient::a2008_calling_calling_40X( const SipSMCommand &command
 		}
 
 		++dialogState.seqNo;
-		sendInvite();
+		//set an "early" remoteUri ... we will update this later
+    //std::cerr << "remoteUri: " << dialogState.remoteUri << "********" << std::endl;
+    //std::cerr << "CombinedUri: "<< command.getCommandString().getParam2() << "***********" << std::endl;
+    if(dialogState.gUriList != "") {
+     std::cerr << "Sending group invite (ReAuth)....." << std::endl;
+     sendGInvite();
+    } else {
+     std::cerr << "Sending invite (ReAuth)....." << std::endl;
+    	sendInvite();
+    }
 
 		return true;
 	}else{
@@ -530,7 +539,7 @@ SipDialogVoipClient::SipDialogVoipClient(MRef<SipStack*> stack, MRef<SipIdentity
 
 SipDialogVoipClient::~SipDialogVoipClient(){	
 }
-void SipDialogVoipClient::sendGInvite(string uri_l){
+void SipDialogVoipClient::sendGInvite(){
 	MRef<SipRequest*> inv;
 	string keyAgreementMessage;
 	inv = SipRequest::createSipMessageInvite(
@@ -587,7 +596,8 @@ void SipDialogVoipClient::sendGInvite(string uri_l){
   temp += uri_list[i];
   std::cerr << "temp: " << temp << std::endl;
   MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(temp, "application/resource-lists+xml");*/
-  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(uri_l, "application/resource-lists+xml");
+  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(dialogState.gUriList,
+                                           "application/resource-lists+xml");
   //add the rcl part to the sdp packet
   rclMIME->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
 	/* Add the latter to the INVITE message */ // If it exists
@@ -714,7 +724,6 @@ void SipDialogVoipClient::sendInviteOk(){
 	//There might be so that there are no SDP. Check!
 	MRef<SdpPacket *> sdp;
 
-  MRef<SipMessageContentMime *> rclMIME = new SipMessageContentMime("multipart/mixed");
 	if (mediaSession){
 #ifdef ENABLE_TS
 		ts.save("getSdpAnswer");
@@ -732,25 +741,9 @@ void SipDialogVoipClient::sendInviteOk(){
 		}
 	}
 	
-	/* Add the latter to the INVITE message */ // If it exists
-	rclMIME->addPart(dynamic_cast<SipMessageContent*>(*sdp));
-
-  //add the rcl list now
-  //TODO: instead of hard coding get the participant list from the gui
-  /*string temp = "";
-  int i = 1;
-  for(; i < uri_list.size() - 1; ++i) temp += uri_list[i] + ", ";
-  temp += uri_list[i];
-  std::cerr << "temp: " << temp << std::endl;
-  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(temp, "application/resource-lists+xml");*/
-  MRef<SipMessageContentRCL*> rcl_part = new SipMessageContentRCL(" ", "application/resource-lists+xml");
-  //add the rcl part to the sdp packet
-  rclMIME->addPart(dynamic_cast<SipMessageContent*>(*rcl_part));
-	/* Add the latter to the INVITE message */ // If it exists
-	
 
 //-------------------------------------------------------------------------------------------------------------//
-	ok->setContent( dynamic_cast<SipMessageContent*>(*rclMIME) );
+	ok->setContent( *sdp );
 //-------------------------------------------------------------------------------------------------------------//
 //	/* Get the SDP Answer from the MediaSession */
 //	MRef<SdpPacket *> sdpAnswer = mediaSession->getSdpAnswer();
