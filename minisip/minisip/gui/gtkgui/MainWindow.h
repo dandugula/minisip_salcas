@@ -30,7 +30,7 @@
 #include"GtkMainUI.h"
 
 #include"DtmfWidget.h"
-
+#include"GroupContactTree.h"
 #include<libmutil/Mutex.h>
 #include<libmutil/minilist.h>
 #include <libglademm/xml.h>
@@ -43,6 +43,10 @@ class PhoneBookModel;
 class PhoneBookTree;
 class SettingsDialog;
 class CertificateDialog;
+class LoginDialog;
+class RegisterDialog;
+class GroupDialog;
+class MemberGroupDialog;
 
 #ifndef WIN32
 	class MTrayIcon;
@@ -69,6 +73,7 @@ class MainWindow : public GtkMainUI,
 		virtual ~MainWindow();
 
 		bool isVisible();
+		bool active();
 		void hide();
 		void show();
 
@@ -124,6 +129,8 @@ class MainWindow : public GtkMainUI,
 		virtual std::string getMemObjectType() const {return "MainWindow";};
 
 		std::string getDataFileName( std::string baseName );
+
+
 		
 	private:
 
@@ -131,10 +138,14 @@ class MainWindow : public GtkMainUI,
 		void hideSlot();
 		void phoneTreeClicked( GdkEventButton * event );
 
+		void signOut();		
 		void accountListInit();
 		void accountListUpdate();
 		void accountListSelect();
 		
+		void unmuteInstanttalk();
+		void muteInstanttalk();
+		void instanttalkClick();
 		void inviteClick();
 		void invite(  std::string uri="" );
 		
@@ -182,6 +193,9 @@ class MainWindow : public GtkMainUI,
 		Gtk::Window * mainWindowWidget;
 		Gtk::Notebook * mainTabWidget;
 		Gtk::TreeView * phoneBookTreeView;
+//Group Communication
+                //nebula
+//
 		Gtk::Menu * phoneMenu;
 		Gtk::MenuItem * phoneAddMenu;
 		Gtk::MenuItem * phoneAddAddressMenu;
@@ -190,11 +204,13 @@ class MainWindow : public GtkMainUI,
 		Gtk::ComboBox * accountListView;
 		Gtk::Label * accountLabel;
 		Gtk::Entry * uriEntry;
-		PhoneBookModel * phoneBookModel;
+		Gtk::TreeView * groupContactTreeView;
+                PhoneBookModel * phoneBookModel;
 		PhoneBookTree * phoneBookTree;
 		Glib::RefPtr<Gtk::TreeSelection> treeSelection;
 		Gtk::Main *kit;
-
+		
+		Gtk::CheckMenuItem * nebulaMenu;//nebula checkmenu
 		Gtk::CheckMenuItem * viewCallListMenu;
 		Gtk::CheckMenuItem * viewStatusMenu;
 
@@ -202,6 +218,7 @@ class MainWindow : public GtkMainUI,
 		Glib::RefPtr<TransportList> transportList;
 		Glib::RefPtr<Gtk::IconFactory> factory;
 		Glib::RefPtr<Gdk::Pixbuf> icon;
+                
 
 		/**
 		* This function is connected to the window close icon
@@ -212,6 +229,10 @@ class MainWindow : public GtkMainUI,
 		
 		SettingsDialog * settingsDialog;
 		CertificateDialog * certificateDialog;
+		LoginDialog * loginDialog;//initialize logindialog
+		RegisterDialog * registerDialog;
+		GroupDialog * groupDialog;
+		MemberGroupDialog * membergroupDialog;
 		
 		#ifndef WIN32
 			MTrayIcon * trayIcon;
@@ -241,4 +262,4 @@ class MainWindow : public GtkMainUI,
 };
 
 
-#endif	
+#endif

@@ -7,7 +7,7 @@ AM_CPPFLAGS = -DMINISIP_DATADIR="\"$(pkgdatadir)\""	\
 		-I$(top_srcdir)/include \
 		$(MINISIP_CFLAGS)
 
-AM_LDFLAGS = $(RELOC_LDFLAGS)
+AM_LDFLAGS = $(RELOC_LDFLAGS) -lghttp
 
 minisip_gtkgui_LDADD =	$(MINISIP_LIBS) \
 			$(HILDON_LIBS)  \
@@ -32,8 +32,15 @@ minisip_gtkgui_SOURCES = MainWindow.cxx \
 				AccountsStatusWidget.cxx \
 				DtmfWidget.cxx \
 				GtkMainUI.cxx \
-				GtkMain.cxx
-
+				LoginDialog.cxx \
+				RegisterDialog.cxx \
+				GroupDialog.cxx \
+				MemberGroupDialog.cxx \
+				GtkMain.cxx \
+        GroupContactTree.cxx \
+				JSON.cxx \
+				JSONValue.cxx \
+				profile_mgmt_client.cxx
 noinst_HEADERS  = MainWindow.h \
 			CallWidget.h \
 			ConferenceWidget.h \
@@ -49,7 +56,15 @@ noinst_HEADERS  = MainWindow.h \
 			AccountsList.h \
 			AccountsStatusWidget.h \
 			DtmfWidget.h \
-			GtkMainUI.h 
+			LoginDialog.h \
+			RegisterDialog.h \
+			GroupDialog.h \
+			MemberGroupDialog.h \
+                        GroupContactTree.h \
+			GtkMainUI.h \
+			JSON.h \
+			JSONValue.h \
+			profile_mgmt_client.h
 
 if OS_WIN
 

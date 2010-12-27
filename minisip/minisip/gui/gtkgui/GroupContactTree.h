@@ -9,8 +9,7 @@ using namespace std;
 enum
 {
 	Groups=0,
-        Contacts,
-	COLUMNS
+        COLUMNS
   	
 };
 

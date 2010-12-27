@@ -1,38 +1,33 @@
 #include"GroupContactTree.h"
 
- 
 void setup_tree_view (GtkTreeView *treeview)
 {
   group_details *groups=extractProfileInfo();
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
-
-  std::cerr << groups[0].groupName << std::endl;
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes("Groups", renderer,"text",Groups,NULL);
   gtk_tree_view_append_column(treeview,column);
   GtkTreeStore *store;
   GtkTreeIter iter, child;
-  guint i = 0;
-
-
-store=gtk_tree_store_new(COLUMNS,G_TYPE_STRING,G_TYPE_STRING);
-
-guint j=0;
-  
-   for(i=0;groups[i].groupName !="";i++)
+  guint i,j;
+  store=gtk_tree_store_new(COLUMNS,G_TYPE_STRING);
+  for(i=0;groups[i].groupName !="";i++)
   {
+      cout<<groups[i].groupName<<endl;
       gtk_tree_store_append (store, &iter, NULL);
       gtk_tree_store_set(store,&iter,Groups,groups[i].groupName.c_str(),-1);      
-      for(j=0;j < groups[i].users;j++)
-      {
+      j=0;
+      while(j<groups[i].users)
+       {
+           cout<<groups[i].user_profile[j].username.c_str()<<endl;
             gtk_tree_store_append (store, &child, &iter);
             gtk_tree_store_set(store,&child,Groups,groups[i].user_profile[j].username.c_str(),-1);      
-
+	j++;	 
         }
                   
   }
-  
+    
   gtk_tree_view_set_model (treeview, GTK_TREE_MODEL (store));
   gtk_tree_view_expand_all (treeview);
   gtk_widget_show(GTK_WIDGET(treeview));

@@ -1,5 +1,5 @@
 CPPFLAGS = @CPPFLAGS@ -DDATADIR="$(datadir)" -DPLUGIN_PATH="$(pkglibdir)"
-LDFLAGS = @LDFLAGS@
+LDFLAGS = @LDFLAGS@ 
 
 EXTRA_DIST = minisip-libavcodec.patch minisip.spec
 

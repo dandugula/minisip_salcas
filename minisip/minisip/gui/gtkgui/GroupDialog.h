@@ -6,6 +6,7 @@
 #include <libmsip/SipDialogConfig.h>
 #include <libglademm/xml.h>
 #include <gtkmm.h>
+#include "MainWindow.h"
 
 
 class GroupDialog
@@ -17,7 +18,7 @@ class GroupDialog
 		 
 		void show();
 		void hide();
-		//void removeGroup();
+		void removeGroup();
 		void addGroup();
 		void reset();
 			
@@ -31,5 +32,6 @@ class GroupDialog
 				
 		Gtk::Button * addgroupButton;
 		Gtk::Button * resetButton;
+                Gtk::TreeView * GroupTreeView;
 };
 #endif

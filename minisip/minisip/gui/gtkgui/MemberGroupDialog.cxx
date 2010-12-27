@@ -3,8 +3,7 @@
 #include"GroupDialog.h"
 #include"MemberGroupDialog.h"
 #include<libminisip/gui/Gui.h>
-#include "profile_mgmt_client.h"
-
+//#include "profile_mgmt_client.h"
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -31,8 +30,8 @@ MemberGroupDialog::MemberGroupDialog( Glib::RefPtr<Gnome::Glade::Xml> theRefXml)
 	refXml->get_widget( "selectgroupLabel", selectgroupLabel );
 	refXml->get_widget( "addmemberButton", addmemberButton );
 	refXml->get_widget( "resetButton", resetButton );
-       
-	groupList=selectgroupList->gobj();
+        refXml->get_widget("treeView1",GroupTreeView);
+	
        
 
 	addmemberButton->signal_clicked().connect( SLOT( *this, &MemberGroupDialog::addMember));
@@ -48,7 +47,7 @@ MemberGroupDialog::~MemberGroupDialog(){
 }
 void MemberGroupDialog::show(){
 	membergroupDialogWidget->show();
-     updateGroupList();
+       updateGroupList();
 }
 void MemberGroupDialog::hide(){
 	membergroupDialogWidget->hide();
@@ -56,26 +55,26 @@ void MemberGroupDialog::hide(){
 void MemberGroupDialog::addMember()
 {
       nebula_addContact(nebulanameEntry->get_text(), contactnameEntry->get_text());
-      group_details *grp,grp1;
-      grp=&grp1;
-      grp->groupId=a;
-      cout<<grp->groupId<<endl;
-      profile * user,user1;
-      user=&user1;
-      user->username=nebulanameEntry->get_text();
-      cout<<user->username<<endl;
-      nebula_insertUserIntoGroup(user,grp);
-    
+      group_details grp;
+     // grp.groupId=groupId;
+      //cout<<grp->groupId<<endl;
+      //profile user,user1;
+      //user.username=nebulanameEntry->get_text();
+      nebula_insertUserIntoGroup(nebulanameEntry->get_text(),groupId);
+      hide();
+      GroupTreeView->remove_all_columns();
+      setup_tree_view(GroupTreeView->gobj());
+      
       
 }
-    
-      
-       
-
-void MemberGroupDialog::editMemberGroup(){
+          
+void MemberGroupDialog::editMemberGroup()
+{
 	this->show();
 	contactnameEntry->set_text("");
-	//nebulanameEntry->set_text(nebulanameEntry->get_text());
+}
+void MemberGroupDialog::removeMemberGroup(){
+
 }
 
 void MemberGroupDialog::updateGroupList()
@@ -84,28 +83,34 @@ void MemberGroupDialog::updateGroupList()
   group_details *grp=extractProfileInfo();
 /* for (i=0;grp[i].groupName!="";i++)
     gtk_combo_box_remove_text(groupList,i);   */
+  groupList=selectgroupList->gobj();
   for (i=0;grp[i].groupName !="";i++)
-   {
+  {
     gtk_combo_box_append_text(groupList,grp[i].groupName.c_str());
-}}
+  }
+}
+
 
 void MemberGroupDialog::groupListSelect()
 {
-int group_id,i;
+ int group_id,i;
+ groupList=selectgroupList->gobj();
  char * str=gtk_combo_box_get_active_text(groupList);
  group_details *grp=extractProfileInfo();
  for (i=0;grp[i].groupName!="";i++)
  {
   if(grp[i].groupName==str)
     group_id=grp[i].groupId;
-  }
- a=group_id;
+ }
+  groupId=group_id;
 }
+
+
 
 void MemberGroupDialog::reset()
 {
-contactnameEntry->set_text("");
-nebulanameEntry->set_text("");
+ contactnameEntry->set_text("");
+ nebulanameEntry->set_text("");
 }
 
 

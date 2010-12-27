@@ -25,7 +25,7 @@ class LoginDialog
 		 
 		void show();
 		void hide();
-	void signIn();
+		void signIn();
 					
 	private:
 		Glib::RefPtr<Gnome::Glade::Xml> refXml;
@@ -39,6 +39,8 @@ class LoginDialog
 		Gtk::Entry * npasswordEntry;
 		Gtk::Label * npasswordLabel;
                 Gtk::TreeView * groupContactTreeView;
+		Gtk::Label * nebnameLabel;
+
 		Gtk::Button * signinButton;
 		Gtk::Button * createaccountButton;
 };

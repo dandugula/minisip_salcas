@@ -159,16 +159,18 @@ group_details * extractProfileInfo()
 	  groups[i].groupId=atoi(group_id);
           cout<<"group id is "<<groups[i].groupId<<endl;		
 	  JSONObject::iterator iter = json_obj2.begin();
+		int j = 0;
 	  for(; iter != json_obj2.end(); ++iter) 
           {
-		int j = 0;
+
 	     if(iter->second->IsObject()) 
             { 
              JSONObject json_obj3 = iter->second->AsObject();
-	     JSONObject::iterator iter1 = json_obj3.begin();
-	     {
-		cout <<"------------------" << (convertToChar(iter1->first)) << "--------------------" << endl;
+	     //JSONObject::iterator iter1 = json_obj3.begin();
+
+		//cout <<"------------------" << (convertToChar(iter1->first)) << "--------------------" << endl;
 	        groups[i].user_profile[j].username=convertToChar(json_obj3[L"username"]->AsString().c_str());
+                cout<<groups[i].user_profile[j].username<<endl;
                 groups[i].user_profile[j].address=convertToChar(json_obj3[L"address"]->AsString().c_str());
                 groups[i].user_profile[j].domain=convertToChar(json_obj3[L"domain"]->AsString().c_str());
                 groups[i].user_profile[j].fullName=convertToChar(json_obj3[L"fullName"]->AsString().c_str());
@@ -179,12 +181,11 @@ group_details * extractProfileInfo()
                 groups[i].user_profile[j].userId=atoi(convertToChar(json_obj3[L"id"]->AsString().c_str()));
 		groups[i].users++;
           
-            }
 				
-            } else { }
+            }
 		++j;
           }
-	} else { }
+	} 
      }
    }
    return groups;
@@ -200,13 +201,13 @@ int nebula_login(credentials*cred1,group_details *grp)
   REST_parameters rest;
   uriCreation(&rest,ghttp_type_get,"RESTGroups/","","retrieveAllGroupsMembers/");
   Resp res;
-  /*requestProcessing(&rest,request_body,&res);
+  requestProcessing(&rest,request_body,&res);
   if((res.status_code)==401)
   {
     std::cout << "Invalid username / password " << std::endl;
     return 600;
-  }*/
-  grp=extractProfileInfo(); 
+  }
+  //grp=extractProfileInfo(); 
   return 0;
 }
 
@@ -293,12 +294,12 @@ Resp nebula_addGroup(group_details *grp)
   return res;
 }
 
-Resp nebula_insertUserIntoGroup(profile *user,group_details *grp)
+Resp nebula_insertUserIntoGroup(string userName,int groupId)
 {
   cout<<"inside insertintogroup"<<endl; 
   JSONValue *json_nebula_insertUser;
-  JSONValue group_id((double)grp->groupId);
-  JSONValue username(convertToWchar(user->username));
+  JSONValue group_id((double)groupId);
+  JSONValue username(convertToWchar(userName));
   JSONObject json_insertIntoGroup;
   json_insertIntoGroup.insert(std::pair<wstring,JSONValue*>(L"username",&username));
   json_insertIntoGroup.insert(std::pair<wstring,JSONValue*>(L"groupID",&group_id));

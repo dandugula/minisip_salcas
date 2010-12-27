@@ -6,6 +6,7 @@
 #include <libmsip/SipDialogConfig.h>
 #include <libglademm/xml.h>
 #include <gtkmm.h>
+
 //#include"profile_mgmt_client.h"
 
 
@@ -21,7 +22,7 @@ class MemberGroupDialog
 		void hide();
 		void addMember();
 		void editMemberGroup();
-		//void removeMemberGroup;
+		void removeMemberGroup();
 		void reset();
 		void updateGroupList();
 		void groupListSelect();
@@ -43,6 +44,7 @@ class MemberGroupDialog
 				
 		Gtk::Button * addmemberButton;
 		Gtk::Button * resetButton;
-                int a;
+                Gtk::TreeView *GroupTreeView;
+                int groupId;
 };
 #endif

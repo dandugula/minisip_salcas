@@ -62,7 +62,7 @@ Resp nebula_register(profile *user_profile);
 int nebula_login(credentials*cred1,group_details *grp);
 Resp nebula_addContact(string contactName,string nickName);
 Resp nebula_addGroup(group_details *grp);
-Resp nebula_insertUserIntoGroup(profile *user,group_details *grp);
+Resp nebula_insertUserIntoGroup(string username,int groupId);
 Resp nebula_deleteContact(profile *user);
 Resp nebula_deleteGroup(group_details *grp);
 group_details * extractProfileInfo();

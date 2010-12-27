@@ -41,9 +41,13 @@
 #include"CertificateDialog.h"
 #include"DtmfWidget.h"
 #include"TransportList.h"
+#include"LoginDialog.h"
+#include"RegisterDialog.h"
+#include"GroupDialog.h"
+#include"MemberGroupDialog.h"
 
 #include<glib.h>
-
+#include<gtk/gtk.h>
 #ifndef WIN32
 #	include"TrayIcon.h"
 #endif
@@ -85,6 +89,11 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	Gtk::Button * callButton;
 	Gtk::Button * imButton;
+	Gtk::Button * instanttalkButton;
+	Gtk::Button * signoutButton;	
+	Gtk::ToggleButton * itButton;
+	Gtk::ToggleButton * stepinButton;//
+	Gtk::ToggleButton * stepoutButton;//
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
 	Gtk::MenuItem * quitMenu;
@@ -92,10 +101,17 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	Gtk::MenuItem * addAddressContactMenu;
 	Gtk::MenuItem * removeContactMenu;
 	Gtk::MenuItem * editContactMenu;
+	Gtk::MenuItem * addGroupMenu;
+	Gtk::MenuItem * removeGroupMenu;
+	Gtk::MenuItem * addContactGroupMenu;
+	Gtk::MenuItem * editContactGroupMenu;
+	Gtk::MenuItem * removeContactGroupMenu;
 	Gtk::MenuItem * callMenu;
 	Gtk::MenuItem * conferenceMenu;
 	Gtk::MenuItem * imMenu;
 	Gtk::MenuItem * aboutMenu;
+        
+	
 	Glib::RefPtr<Gnome::Glade::Xml>  refXml;
 #ifndef OLDLIBGLADEMM
 	Gtk::Expander * dtmfExpander;
@@ -112,35 +128,44 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 		std::cerr << ex.what() << std::endl;
 		exit( 1 );
 	}
-
+        
 #ifndef HILDON_SUPPORT
 	refXml->get_widget( "minisipMain", mainWindowWidget );
 	refXml->get_widget( "mainTabWidget", mainTabWidget );
 #endif
 	refXml->get_widget( "phoneBookTree", phoneBookTreeView );
-	
+//Group Communication	
+	//nebula
+        refXml->get_widget( "treeView1",groupContactTreeView);
 	refXml->get_widget( "phoneMenu", phoneMenu );
 	refXml->get_widget( "phoneAddMenu", phoneAddMenu );
 	refXml->get_widget( "phoneAddAddressMenu", phoneAddAddressMenu );
 	refXml->get_widget( "phoneRemoveMenu", phoneRemoveMenu );
 	refXml->get_widget( "phoneEditMenu", phoneEditMenu );
-	
-	refXml->get_widget( "addContactMenu", addContactMenu );
+        
+ 	refXml->get_widget( "addContactMenu", addContactMenu );
 	refXml->get_widget( "addAddressContactMenu", addAddressContactMenu );
 	refXml->get_widget( "removeContactMenu", removeContactMenu );
 	refXml->get_widget( "editContactMenu", editContactMenu );
+	
+	refXml->get_widget( "addGroupMenu", addGroupMenu );
+	refXml->get_widget( "removeGroupMenu", removeGroupMenu );
+	refXml->get_widget( "addContactGroupMenu", addContactGroupMenu );
+	refXml->get_widget( "removeContactGroupMenu", removeContactGroupMenu );
+	refXml->get_widget( "editContactGroupMenu", editContactGroupMenu );
 
 	refXml->get_widget( "callMenu", callMenu );
 	refXml->get_widget( "conferenceMenu", conferenceMenu );
 	refXml->get_widget( "imMenu", imMenu );
 	refXml->get_widget( "aboutMenu", aboutMenu );
-
+	
 #ifndef OLDLIBGLADEMM
 	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
 	dtmfWidget->setHandler( this );
 	refXml->get_widget( "dtmfExpander", dtmfExpander );
 	dtmfExpander->add( *dtmfWidget );
 #endif
+
 
 #ifdef HILDON_SUPPORT
 	/* Create the hildon app */
@@ -158,6 +183,8 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 			"Minisip" );
 
 	Gtk::Widget * w;
+	//Gtk::Widget * wContact;
+	Gtk::Widget * wConversation;
 	Gtk::HBox * mainHBox;
 
 	mainHBox = manage( new Gtk::HBox( true, 6 ) );
@@ -165,12 +192,18 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	mainTabWidget = manage( new Gtk::Notebook() );
 	
 	refXml->get_widget( "dialVBox", w );
-
+	//refXml->get_widget( "contactVBox", wContact );
+	refXml->get_widget( "conversationVBox", wConversation );
+	
+	//wContact->add(*mainTabWidget);
+	wConversation->add(*mainTabWidget);
 	w->reparent( *mainHBox );
 	mainHBox->add( *mainTabWidget );
 	//mainHBox->pack_end( *mainTabWidget );
 
 	mainHBox->show_all();
+	//wContact->show_all();
+	wConversation->show_all();
 
 	appview->add( *mainHBox );
 
@@ -185,6 +218,9 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	w->reparent( *mainMenu );
 #endif
 
+
+	//Group Communication	
+	
 
 
 	treeSelection = phoneBookTreeView->get_selection();
@@ -225,6 +261,9 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 		BIND<Glib::RefPtr<Gtk::TreeSelection> >(
 		SLOT( *phoneBookModel, &PhoneBookModel::editContact ),
 		treeSelection ));
+	/*Group Conversation*/	
+		groupDialog = new GroupDialog( refXml );
+		membergroupDialog = new MemberGroupDialog( refXml );
 	
 	/* Contact menu from the menubar */
 	addAddressContactMenu->signal_activate().connect(
@@ -246,7 +285,18 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 		BIND<Glib::RefPtr<Gtk::TreeSelection> >(
 		SLOT( *phoneBookModel, &PhoneBookModel::editContact ),
 		treeSelection ));
-	
+	/* Group Menu */
+	addGroupMenu->signal_activate().connect(
+		SLOT( *groupDialog, &GroupDialog::show ));
+	removeGroupMenu->signal_activate().connect(
+		SLOT( *groupDialog, &GroupDialog::show ));
+	addContactGroupMenu->signal_activate().connect(
+		SLOT( *membergroupDialog, &MemberGroupDialog::show ));
+	editContactGroupMenu->signal_activate(). connect(
+		SLOT( *membergroupDialog, &MemberGroupDialog:: editMemberGroup));
+	removeContactGroupMenu->signal_activate(). connect(
+		SLOT( *membergroupDialog, &MemberGroupDialog:: removeMemberGroup));
+		
 	refXml->get_widget( "callButton", callButton );
 
 	callButton->signal_clicked().connect( SLOT( *this, &MainWindow::inviteClick ) );
@@ -261,12 +311,34 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	phoneBookTreeView->signal_row_activated().connect( SLOT( *this, &MainWindow::inviteFromTreeview ) );
 
+	//groupContactTreeView->signal_row_activated().connect( SLOT( *this, &MainWindow::selectedTreeView ) );
+
 	refXml->get_widget( "imButton", imButton );
 
 	imButton->signal_clicked().connect( SLOT( *this, &MainWindow::imClick ) );
 	
 	imMenu->signal_activate().connect( SLOT( *this, &MainWindow::imClick ) );
-#ifdef HAVE_LIBGLADEMM_2_6
+//INSTANT TALK		
+	refXml->get_widget( "instanttalkButton", instanttalkButton );
+
+	instanttalkButton->signal_clicked().connect( SLOT( *this, &MainWindow::instanttalkClick ) );
+	
+	refXml->get_widget( "signoutButton", signoutButton );
+	
+	signoutButton->signal_clicked().connect( SLOT( *this, &MainWindow::quit ) );
+
+	refXml->get_widget( "itButton", itButton );
+
+	itButton->signal_toggled().connect( SLOT( *this, &MainWindow::instanttalkClick ) );
+
+	refXml->get_widget( "stepinButton", stepinButton );
+
+	stepinButton->signal_toggled().connect( SLOT( *this, &MainWindow::unmuteInstanttalk ) );
+	
+	refXml->get_widget( "stepoutButton", stepoutButton );
+
+	stepoutButton->signal_toggled().connect( SLOT( *this, &MainWindow::muteInstanttalk ) );//
+#ifdef HAVE_LIBGLADEMM_2_
 	aboutMenu->signal_activate().connect( SLOT( *this, &MainWindow::aboutClick ) );
 #else
 	aboutMenu->set_sensitive( false );
@@ -276,12 +348,17 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, transportList );
+	//std::cerr << "1...." << std::endl;
+	loginDialog = new LoginDialog( refXml );// creating logindialog
+	//std::cerr << "1.1..." << std::endl;
 	
 	refXml->get_widget( "accountList", accountListView );
 	refXml->get_widget( "accountLabel", accountLabel );
 	refXml->get_widget( "callUriEntry", uriEntry );
 
 	refXml->get_widget( "prefMenu", prefMenu );
+	//std::cerr << "2...." << std::endl;
+	refXml->get_widget("nebulaMenu",nebulaMenu);//nebula menu
 	refXml->get_widget( "certMenu", certMenu );
 	refXml->get_widget( "quitMenu", quitMenu );
 	
@@ -290,6 +367,9 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	prefMenu->signal_activate().connect( SLOT( *settingsDialog, &SettingsDialog::show ) );
 	certMenu->signal_activate().connect( SLOT( *this, &MainWindow::runCertificateSettings ) );
+	//std::cerr << "3...." << std::endl;
+	nebulaMenu->signal_toggled().connect( SLOT( *loginDialog, &LoginDialog::show));//signal for nebula menu
+	//nebulaMenu->signal_deactivate().connect( SLOT( *loginDialog, &LoginDialog::~LoginDialog));//signal for nebula menu
 	
 	//This two signals are for closing minisip ... see MainWindow::quit
 	quitMenu->signal_activate().connect( SLOT( *this, &MainWindow::quit ) );
@@ -335,6 +415,8 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	accountListInit();
 
+
+
 	//mainTabWidget->append_page( *statusWidget, "Accounts" );
 
 	logDispatcher.connect( SLOT( *this, &MainWindow::gotLogEntry ) );
@@ -355,6 +437,8 @@ MainWindow::~MainWindow(){
 	delete certificateDialog;
 	delete statusWindow;
 	delete statusWidget;
+	delete loginDialog;
+	delete registerDialog;
 	delete logWidget;
 	delete phoneMenu;
 
@@ -835,6 +919,39 @@ void MainWindow::accountListSelect() {
 
 	accountLabel->set_label( (*iter)[accountsList->getColumns()->name] );
 }
+// Instant Talk
+void MainWindow::instanttalkClick(){
+	cerr << "INSTANT TALK"<< endl;
+        Glib::RefPtr<Gtk::TreeSelection>selectedVal=groupContactTreeView->get_selection();
+        gpointer gval=gtk_tree_selection_get_user_data(selectedVal->gobj());
+        cout<<"the vlaue is "<<gval;
+        
+        
+ 	//sukru fill here
+}
+
+void MainWindow::unmuteInstanttalk(){
+	cerr << "UNMUTE"<< endl;
+	//sukru fill here
+}
+void MainWindow::muteInstanttalk(){
+	cerr << "MUTE"<< endl;
+	//sukru fill here
+}
+/*void MainWindow::setactiveInstanttalk(){
+	//cerr << "BYE BYE NEBULA"<< endl;
+	Gtk::Widget * widget;
+	Glib::ustring title;
+
+	if( widget->active ){
+		cerr <<"STEP OUT"<< endl;
+	}	
+	else{
+		cerr <<"STEP IN" << endl;
+	}
+
+	//sukru fill here	
+}*/
 
 void MainWindow::inviteClick() {
 //-------------------------------------------
@@ -1136,6 +1253,18 @@ void MainWindow::registerIcons(){
 	iconSet->add_source( *iconSource );
 
 	factory->add( Gtk::StockID( "minisip_noplay" ), *iconSet );
+	factory->add( Gtk::StockID( "minisip_play" ), *iconSet );
+	
+	delete iconSource;
+	delete iconSet;
+	iconSource = new Gtk::IconSource;
+	iconSet = new Gtk::IconSet;
+	
+	iconSource->set_filename( getDataFileName( "noplay.png" ) );
+	iconSource->set_size( Gtk::ICON_SIZE_BUTTON );
+	iconSet->add_source( *iconSource );
+
+	factory->add( Gtk::StockID( "minisip_noplay" ), *iconSet );
 	
 	delete iconSource;
 	delete iconSet;
@@ -1256,9 +1385,9 @@ void MainWindow::onTabChange( GtkNotebookPage * page, guint index ){
 			iterIm != imWidgets.end();
 			iterIm++ ) {
 		bool equal = false;
-		if( imWidget ) equal = (imWidget == (*iterIm) );
+		if( imWidget ) equal = (imWidget == (*iterIm));
 		(*iterIm)->activeWidgetChanged( equal, index );
-	}
-	
-}
+	} 
+
+ }
 

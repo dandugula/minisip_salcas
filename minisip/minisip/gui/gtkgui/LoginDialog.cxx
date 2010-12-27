@@ -28,6 +28,7 @@ LoginDialog::LoginDialog( Glib::RefPtr<Gnome::Glade::Xml> theRefXml):
 	refXml->get_widget( "nusernameLabel", nusernameLabel );
 	refXml->get_widget( "npasswordEntry", npasswordEntry );
 	refXml->get_widget( "npasswordLabel", npasswordLabel );
+	refXml->get_widget( "nebnameLabel", nebnameLabel);
 	refXml->get_widget( "signinButton", signinButton );
 	refXml->get_widget( "createaccountButton", createaccountButton );
         refXml->get_widget( "treeView1", groupContactTreeView);
@@ -56,11 +57,14 @@ void LoginDialog::signIn(){
 	
 	cred->cred_username=nusernameEntry->get_text();
 	cred->cred_password=npasswordEntry->get_text();
-	
-	nebula_login(cred,grp);
+        int success=nebula_login(cred,grp);
+        if(success !=600)
+        {
+        nebnameLabel->set_label( cred->cred_username);   
         loginDialogWidget->hide();
-        cerr<<"calling tree view"<<endl; 
+        cout<<"the set up tree view is called"<<endl;
+        groupContactTreeView->remove_all_columns();
         setup_tree_view(groupContactTreeView->gobj());
-        
+        }
 		
 }

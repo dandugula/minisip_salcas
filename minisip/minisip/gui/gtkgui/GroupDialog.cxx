@@ -2,7 +2,7 @@
 
 #include"GroupDialog.h"
 #include<libminisip/gui/Gui.h>
-#include "profile_mgmt_client.h"
+
 
 #ifdef OLDLIBGLADEMM
 #define SLOT(a,b) SigC::slot(a,b)
@@ -25,6 +25,7 @@ GroupDialog::GroupDialog( Glib::RefPtr<Gnome::Glade::Xml> theRefXml):
 	refXml->get_widget( "groupnameLabel", groupnameLabel );
 	refXml->get_widget( "addgroupButton", addgroupButton );
 	refXml->get_widget( "resetButton", resetButton );
+        refXml->get_widget( "treeView1",GroupTreeView );
 
 	addgroupButton->signal_clicked().connect( SLOT( *this, &GroupDialog::addGroup));
 	resetButton->signal_clicked().connect( SLOT( *this, &GroupDialog::reset));
@@ -44,9 +45,9 @@ void GroupDialog::hide(){
 void GroupDialog::reset(){
 	
 }
-/*void GroupDialog::removeGroup(){
-	groupDialogWidget->show();
-}*/
+void GroupDialog::removeGroup(){
+	//groupDialogWidget->show();
+}
 void GroupDialog::addGroup(){
 		
 	group_details *grp, grp1;
@@ -54,7 +55,9 @@ void GroupDialog::addGroup(){
 	
 	grp->groupName=groupnameEntry->get_text();
 	grp->status="Available";
-
-
-	nebula_addGroup(grp);
+        nebula_addGroup(grp);
+        groupDialogWidget->hide();
+        GroupTreeView->remove_all_columns();
+        setup_tree_view(GroupTreeView->gobj());
+      
 }
