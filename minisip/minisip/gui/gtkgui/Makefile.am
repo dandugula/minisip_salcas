@@ -40,7 +40,8 @@ minisip_gtkgui_SOURCES = MainWindow.cxx \
         GroupContactTree.cxx \
 				JSON.cxx \
 				JSONValue.cxx \
-				profile_mgmt_client.cxx
+				profile_mgmt_client.cxx \
+        InstantTalkWidget.cxx
 noinst_HEADERS  = MainWindow.h \
 			CallWidget.h \
 			ConferenceWidget.h \
@@ -60,12 +61,12 @@ noinst_HEADERS  = MainWindow.h \
 			RegisterDialog.h \
 			GroupDialog.h \
 			MemberGroupDialog.h \
-                        GroupContactTree.h \
+      GroupContactTree.h \
 			GtkMainUI.h \
 			JSON.h \
 			JSONValue.h \
-			profile_mgmt_client.h
-
+			profile_mgmt_client.h \
+			InstantTalkWidget.h
 if OS_WIN
 
 if !DEBUG

@@ -25,6 +25,7 @@
 #include"MainWindow.h"
 
 #include <libminisip/signaling/conference/ConferenceControl.h>
+#include <fstream>
 
 #include<libmutil/stringutils.h>
 
@@ -35,6 +36,7 @@
 #include<libminisip/media/MediaCommandString.h>
 
 #include"CallWidget.h"
+#include"InstantTalkWidget.h"
 #include"ConferenceWidget.h"
 #include"PhoneBook.h"
 #include"SettingsDialog.h"
@@ -788,7 +790,52 @@ void MainWindow::removeCall( string callId ){
 		}
 	}
 }
+void MainWindow::addInstantCall( string callId, string remoteUri, bool incoming,
+		          string securityStatus ){
+	Gtk::Image * icon;
+	Gtk::Label * label = manage( new Gtk::Label );
+	Gtk::HBox * hbox = manage( new Gtk::HBox );
+	Glib::ustring tabLabelText;
 
+	SipUri remote( remoteUri );
+
+	//CallWidget * callWidget = new CallWidget( callId, remoteUri, this, incoming, securityStatus );
+	InstantTalkWidget* instantWidget = new InstantTalkWidget( callId, remoteUri, this, incoming, securityStatus );
+
+	instantWidgets.push_back( instantWidget );
+
+	tabLabelText = remoteUri;
+
+	label->set_text( tabLabelText );
+	
+	if( incoming ){
+		icon = manage( new Gtk::Image( Gtk::Stock::GO_BACK, Gtk::ICON_SIZE_SMALL_TOOLBAR ) );
+	}
+	else{
+		icon = manage( new Gtk::Image( Gtk::Stock::GO_FORWARD, Gtk::ICON_SIZE_SMALL_TOOLBAR ) );
+	}
+
+	hbox->add( *icon );
+	hbox->add( *label );
+	hbox->show_all();
+	
+	mainTabWidget->append_page( *instantWidget, *hbox ) ;
+	instantWidget->show();
+	mainTabWidget->set_current_page( mainTabWidget->get_n_pages() - 1 );
+}
+
+void MainWindow::removeInstantCall( string callId ){
+	//do not increase the iterator automatically ... 
+	//   we remove elements, thus we obtain the next element inside the loop
+	for( list<InstantTalkWidget *>::iterator i = instantWidgets.begin();
+			i != instantWidgets.end(); i++){
+		if( (*i)->getMainCallId() == callId ){
+			mainTabWidget->remove_page( *(*i) );
+			instantWidgets.erase( i );
+			return;
+		}
+	}
+}
 void MainWindow::addConference( string confId, string users,string remoteUri,string callId, bool incoming ){
 	//ContactEntry * entry; //not used
 	Gtk::Image * icon;
@@ -921,12 +968,37 @@ void MainWindow::accountListSelect() {
 }
 // Instant Talk
 void MainWindow::instanttalkClick(){
-	cerr << "INSTANT TALK"<< endl;
+  std::ofstream LogFile;
+  LogFile.open("log_file.txt");
+	LogFile << "INSTANT TALK"<< endl;
         Glib::RefPtr<Gtk::TreeSelection>selectedVal=groupContactTreeView->get_selection();
-        gpointer gval=gtk_tree_selection_get_user_data(selectedVal->gobj());
-        cout<<"the vlaue is "<<gval;
-        
-        
+        //gpointer gval=gtk_tree_selection_get_user_data(selectedVal->gobj());
+        Gtk::TreeModel::iterator it = selectedVal->get_selected();
+        string str;
+        string gcall = "mcu9";
+        it->get_value(0, str);
+        LogFile << "Node: " << str << std::endl;
+        Gtk::TreeNodeChildren::iterator itc = it->children().begin();
+        while(itc != it->children().end()) {
+          string str2;
+          itc->get_value(0, str2);
+          LogFile<< str2 << std::endl;
+          gcall += ":" + str2;
+          ++itc;
+        }
+        LogFile<< gcall << std::endl;
+        LogFile.close();
+        //call
+       	CommandString ginvite("",SipCommandString::invite, gcall);
+				CommandString resp = callback->handleCommandResp("sip",ginvite);
+		    string id = resp.getDestinationId();
+		
+		  if( id == "malformed" ){
+			  Gtk::MessageDialog dialog( "The SIP address you specified is not valid", Gtk::MESSAGE_WARNING );
+			  dialog.show();
+		  }
+
+		addInstantCall( id, "mcu9", false );
  	//sukru fill here
 }
 

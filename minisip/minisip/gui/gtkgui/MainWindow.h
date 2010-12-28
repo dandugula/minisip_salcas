@@ -47,6 +47,7 @@ class LoginDialog;
 class RegisterDialog;
 class GroupDialog;
 class MemberGroupDialog;
+class InstantTalkWidget;
 
 #ifndef WIN32
 	class MTrayIcon;
@@ -111,6 +112,7 @@ class MainWindow : public GtkMainUI,
 
 		virtual void handle( MRef<LogEntry *> );
 		void removeCall(  std::string callId );
+		void removeInstantCall(  std::string callId );
 		void removeConference(  std::string callId );
 		void removeIm(  std::string uri );
 
@@ -171,7 +173,10 @@ class MainWindow : public GtkMainUI,
 					 std::string remoteUri,
 					 std::string callId, 
 					bool incoming );
-		
+	  void addInstantCall (  std::string callId, 
+					 std::string remoteUri, 
+					bool incoming,
+			      		 std::string securityStatus="unprotected" );
 		void updateConfig();
 		void doDisplayErrorMessage(  std::string s );
 		void runCertificateSettings();
@@ -244,6 +249,7 @@ class MainWindow : public GtkMainUI,
 
 		list<CallWidget *> callWidgets;
 		list<ConferenceWidget *> conferenceWidgets;
+		list<InstantTalkWidget *> instantWidgets;
 		list<ImWidget *> imWidgets;
 
 		MRef<SipSoftPhoneConfiguration *> config;
