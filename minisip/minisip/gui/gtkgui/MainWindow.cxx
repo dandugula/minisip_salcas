@@ -528,6 +528,7 @@ void MainWindow::gotCommand(){
 
 	list<CallWidget *>::iterator i;
 	list<ConferenceWidget *>::iterator j;
+  list<InstantTalkWidget *>::iterator k;
 
 	commandsLock.lock();
 	CommandString command = commands.pop_back();
@@ -568,7 +569,11 @@ void MainWindow::gotCommand(){
 			return;
 		}
 	}
-
+  for(k = instantWidgets.begin(); k != instantWidgets.end(); k++) {
+    if( (*k)->handleCommand( command ) ){
+      return;
+    }
+  }
 	if (command.getOp() == SipCommandString::incoming_im){
 
 		list<ImWidget *>::iterator i;
@@ -590,7 +595,9 @@ void MainWindow::gotCommand(){
 	}
 
 	if( command.getOp() == SipCommandString::incoming_available ){
-		addCall( command.getDestinationId(), command.getParam(), true,
+		/*addCall( command.getDestinationId(), command.getParam(), true,
+			 command.getParam2() );*/
+		addInstantCall( command.getDestinationId(), command.getParam(), true,
 			 command.getParam2() );
 		return;
 	}
@@ -999,6 +1006,7 @@ void MainWindow::instanttalkClick(){
 		  }
 
 		addInstantCall( id, "mcu9", false );
+		//addCall( id, "mcu9", false );
  	//sukru fill here
 }
 

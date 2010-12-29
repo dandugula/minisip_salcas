@@ -28,6 +28,7 @@
 #include<libmsip/SipCommandString.h>
 #include<libminisip/gui/Bell.h>
 #include<libminisip/media/MediaCommandString.h>
+#include <fstream>
 //#include<libminisip/media/Session.h>
 //#include<libminisip/media/MediaStream.h>
 
@@ -41,6 +42,7 @@
 
 using namespace std;
 
+  std::ofstream llFile;
 InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri, 
                         MainWindow * mw, bool incoming, string secure):
 		mainWindow( mw ),
@@ -55,8 +57,8 @@ InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri,
 		//transferButton( "Transfer" ),
 //		monitoringButton( "Mute microphone" ),
 //		audioOutSilenceButton( "Silence for my ears"),
-		//monitoringButton( Gtk::StockID( "minisip_record" ), Gtk::StockID( "minisip_norecord" ) ),
-		//audioOutSilenceButton( Gtk::StockID( "minisip_play" ), Gtk::StockID( "minisip_noplay" ) ),
+		monitoringButton( Gtk::StockID( "minisip_record" ), Gtk::StockID( "minisip_norecord" ) ),
+		audioOutSilenceButton( Gtk::StockID( "minisip_play" ), Gtk::StockID( "minisip_noplay" ) ),
 #endif
 #ifdef HAVE_LIBGLADEMM_2_6
 		//callRecordButton( Gtk::Stock::MEDIA_RECORD, Gtk::Stock::MEDIA_RECORD ),
@@ -118,15 +120,15 @@ InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri,
 
 #ifndef OLDLIBGLADEMM
 	topBox = manage( new Gtk::HBox );
-	//topBox->pack_start( monitoringButton, false, false );
-	/*monitoringButton.signal_toggled().connect( 
+	topBox->pack_start( monitoringButton, false, false );
+	monitoringButton.signal_toggled().connect( 
 		SLOT( *this, 
-			&CallWidget::monitorButtonToggled ) );
+			&InstantTalkWidget::monitorButtonToggled ) );
 			
 	topBox->pack_start( audioOutSilenceButton, false, false );
 	audioOutSilenceButton.signal_toggled().connect( 
 		SLOT( *this, 
-			&CallWidget::audioOutSilenceButtonToggled ) );*/
+			&InstantTalkWidget::audioOutSilenceButtonToggled ) );
 	
 #ifdef HAVE_LIBGLADEMM_2_6
 	//topBox->pack_start( callRecordButton, false, false );
@@ -134,9 +136,9 @@ InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri,
 		SLOT( *this, 
 			&CallWidget::callRecordButtonToggled ) );*/
 #endif
-	/*pack_start( *topBox, false, false, 4 );
+	pack_start( *topBox, false, false, 4 );
 	
-	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
+	/*DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
 	dtmfWidget->setHandler( this );
 	dtmfArrow.add( *dtmfWidget ); 
 	pack_start( dtmfArrow, false, false, 4 );
@@ -171,7 +173,7 @@ InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri,
 	topBox->show_all();
 	//buttonBox2.show_all();
 	buttonBox.show_all();
-//	rejectButton.show();
+	//rejectButton.show();
 //        acceptButton.hide();
 
 	//acceptButton.signal_clicked().connect( SLOT( *this, &InstantTalkWidget::accept ) );
@@ -209,6 +211,7 @@ InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri,
 		}
 
 		startRinging();
+    accept();
 	}
 	else{
 		//acceptButton.set_sensitive( false );
@@ -221,7 +224,6 @@ InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri,
 
 InstantTalkWidget::~InstantTalkWidget(){
 }
-#if 0
 void InstantTalkWidget::accept(){
 	CommandString * cmd = NULL;
 	switch( state ){
@@ -241,7 +243,6 @@ void InstantTalkWidget::accept(){
 			delete cmd;
 	}
 }
-#endif
 /*void CallWidget::reject(){
 	CommandString cmdstr("","");
 	stopRinging();
@@ -320,10 +321,10 @@ void CallWidget:: cancelScreen(){
 
 
 }
+*/
 
 
-
-void CallWidget::monitorButtonToggled () {
+void InstantTalkWidget::monitorButtonToggled () {
 #ifndef OLDLIBGLADEMM
 	string param2;
 	if( monitoringButton.get_active() ) {
@@ -339,7 +340,7 @@ void CallWidget::monitorButtonToggled () {
 #endif
 }
 
-void CallWidget::audioOutSilenceButtonToggled () {
+void InstantTalkWidget::audioOutSilenceButtonToggled () {
 #ifndef OLDLIBGLADEMM
 	string param2;
 	if( audioOutSilenceButton.get_active() ) {
@@ -354,7 +355,7 @@ void CallWidget::audioOutSilenceButtonToggled () {
 	mainWindow->getCallback()->handleCommand("media", cmdstr );
 #endif
 }
-
+/*
 void CallWidget::callRecordButtonToggled () {
 #ifdef HAVE_LIBGLADEMM_2_6
 	string param;
@@ -392,12 +393,13 @@ bool InstantTalkWidget::handleCommand( CommandString command ){
 			if( command.getParam().length() > 0 ){
 				who = " with " + command.getParam();
 			}
-
+      llFile.open("llfile.txt");
+      llFile << "IN call" << endl;
 			status.set_markup( "<big><b>In call" + who + "</b></big>" );
 
 #ifndef OLDLIBGLADEMM
-			//monitoringButton.show();
-			//audioOutSilenceButton.show();
+			monitoringButton.show();
+			audioOutSilenceButton.show();
 #ifdef HAVE_LIBGLADEMM_2_6
 			//callRecordButton.show();
 #endif
@@ -465,8 +467,8 @@ bool InstantTalkWidget::handleCommand( CommandString command ){
 					//rejectButton.set_label( "Close" );
 					state = CALL_WIDGET_STATE_TERMINATED;
 #ifndef OLDLIBGLADEMM
-					//monitoringButton.hide();
-					//audioOutSilenceButton.hide();
+					monitoringButton.hide();
+					audioOutSilenceButton.hide();
 #ifdef HAVE_LIBGLADEMM_2_6
 					//callRecordButton.hide();
 #endif
@@ -485,8 +487,8 @@ bool InstantTalkWidget::handleCommand( CommandString command ){
 					//rejectButton.set_label( "Close" );
 					state = CALL_WIDGET_STATE_TERMINATED;
 #ifndef OLDLIBGLADEMM
-					//monitoringButton.hide();
-					//audioOutSilenceButton.hide();
+				  monitoringButton.hide();
+					audioOutSilenceButton.hide();
 #ifdef HAVE_LIBGLADEMM_2_6
 					//callRecordButton.hide();
 #endif
@@ -701,7 +703,7 @@ void InstantTalkWidget::activeWidgetChanged( bool isActive, int currentActive ) 
 #endif
 		if( getState() == CALL_WIDGET_STATE_INCALL 
 #ifndef OLDLIBGLADEMM
-			//&& ! monitoringButton.get_active() 
+			&& ! monitoringButton.get_active() 
 #endif
 			){
 			CommandString cmdstr( getMainCallId(), 

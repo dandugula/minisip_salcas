@@ -29,7 +29,7 @@
 #include<libmutil/CommandString.h>
 #include<libmutil/TimeoutProvider.h>
 #include<libminisip/gui/Bell.h>
-
+#include"CallWidget.h"
 #include"DtmfWidget.h"
 
 #define CALL_WIDGET_STATE_TERMINATED 	0
@@ -78,7 +78,7 @@ class InstantTalkWidget : public Gtk::VBox
 		void hideAcceptButton();
 		virtual bool handleCommand( CommandString command );
 
-		//void accept();
+		void accept();
 		//void reject();
 /***********************************************************************/
 		//void addCamera();
@@ -103,12 +103,12 @@ class InstantTalkWidget : public Gtk::VBox
 		/**
 		Event handler for monitoring button ... on toggle()
 		*/
-		//void monitorButtonToggled ();
+		void monitorButtonToggled ();
 
 		/**
 		Event handler for audioOutSilence button ... on toggle()
 		*/
-		//void audioOutSilenceButtonToggled ();
+		void audioOutSilenceButtonToggled ();
 
 		/**
 		Event handler for call recording button ... on toggle()
@@ -146,8 +146,8 @@ class InstantTalkWidget : public Gtk::VBox
 		//Gtk::Label transferProgress;
 //		Gtk::CheckButton monitoringButton;
 //		Gtk::CheckButton audioOutSilenceButton;
-		//IconToggleButton monitoringButton;
-		//IconToggleButton audioOutSilenceButton;
+		IconToggleButton monitoringButton;
+		IconToggleButton audioOutSilenceButton;
 #endif
 #ifdef HAVE_LIBGLADEMM_2_6
 		//IconToggleButton callRecordButton;
