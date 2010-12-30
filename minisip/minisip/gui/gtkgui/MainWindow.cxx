@@ -23,7 +23,6 @@
 
 
 #include"MainWindow.h"
-
 #include <libminisip/signaling/conference/ConferenceControl.h>
 #include <fstream>
 
@@ -47,7 +46,6 @@
 #include"RegisterDialog.h"
 #include"GroupDialog.h"
 #include"MemberGroupDialog.h"
-
 #include<glib.h>
 #include<gtk/gtk.h>
 #ifndef WIN32
@@ -160,7 +158,6 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	refXml->get_widget( "conferenceMenu", conferenceMenu );
 	refXml->get_widget( "imMenu", imMenu );
 	refXml->get_widget( "aboutMenu", aboutMenu );
-	
 #ifndef OLDLIBGLADEMM
 	DtmfWidget * dtmfWidget = manage( new DtmfWidget() );
 	dtmfWidget->setHandler( this );
@@ -350,16 +347,13 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	certificateDialog = new CertificateDialog( refXml );
 	settingsDialog = new SettingsDialog( refXml, transportList );
-	//std::cerr << "1...." << std::endl;
 	loginDialog = new LoginDialog( refXml );// creating logindialog
-	//std::cerr << "1.1..." << std::endl;
 	
 	refXml->get_widget( "accountList", accountListView );
 	refXml->get_widget( "accountLabel", accountLabel );
 	refXml->get_widget( "callUriEntry", uriEntry );
 
 	refXml->get_widget( "prefMenu", prefMenu );
-	//std::cerr << "2...." << std::endl;
 	refXml->get_widget("nebulaMenu",nebulaMenu);//nebula menu
 	refXml->get_widget( "certMenu", certMenu );
 	refXml->get_widget( "quitMenu", quitMenu );
@@ -369,7 +363,6 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 
 	prefMenu->signal_activate().connect( SLOT( *settingsDialog, &SettingsDialog::show ) );
 	certMenu->signal_activate().connect( SLOT( *this, &MainWindow::runCertificateSettings ) );
-	//std::cerr << "3...." << std::endl;
 	nebulaMenu->signal_toggled().connect( SLOT( *loginDialog, &LoginDialog::show));//signal for nebula menu
 	//nebulaMenu->signal_deactivate().connect( SLOT( *loginDialog, &LoginDialog::~LoginDialog));//signal for nebula menu
 	
@@ -595,12 +588,18 @@ void MainWindow::gotCommand(){
 	}
 
 	if( command.getOp() == SipCommandString::incoming_available ){
-		/*addCall( command.getDestinationId(), command.getParam(), true,
-			 command.getParam2() );*/
-		addInstantCall( command.getDestinationId(), command.getParam(), true,
+		addCall( command.getDestinationId(), command.getParam(), true,
+			 command.getParam2() );
+    return;
+  }
+  if(command.getOp() == SipCommandString::instant_incoming_available) {
+		//addInstantCall( command.getDestinationId(), command.getParam(), true,
+			 //command.getParam2() );
+		addInstantCall( command.getDestinationId(), "Group Call", true,
 			 command.getParam2() );
 		return;
 	}
+
 	if( command.getOp()=="conf_join_received" ){
 		//string confid=itoa(rand());
 		string confid="";
@@ -975,26 +974,20 @@ void MainWindow::accountListSelect() {
 }
 // Instant Talk
 void MainWindow::instanttalkClick(){
-  std::ofstream LogFile;
-  LogFile.open("log_file.txt");
-	LogFile << "INSTANT TALK"<< endl;
         Glib::RefPtr<Gtk::TreeSelection>selectedVal=groupContactTreeView->get_selection();
         //gpointer gval=gtk_tree_selection_get_user_data(selectedVal->gobj());
         Gtk::TreeModel::iterator it = selectedVal->get_selected();
         string str;
-        string gcall = "mcu9";
+        //Remove hard coded reflector uri
+        string gcall = "plm";
         it->get_value(0, str);
-        LogFile << "Node: " << str << std::endl;
         Gtk::TreeNodeChildren::iterator itc = it->children().begin();
         while(itc != it->children().end()) {
           string str2;
           itc->get_value(0, str2);
-          LogFile<< str2 << std::endl;
           gcall += ":" + str2;
           ++itc;
         }
-        LogFile<< gcall << std::endl;
-        LogFile.close();
         //call
        	CommandString ginvite("",SipCommandString::invite, gcall);
 				CommandString resp = callback->handleCommandResp("sip",ginvite);

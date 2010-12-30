@@ -244,14 +244,27 @@ bool SipDialogVoipServer::a3001_start_ringing_INVITE( const SipSMCommand &comman
 			cerr << "IDENTITY: did not find identity header value"<< endl;
 		}
 */		
-		CommandString cmdstr(dialogState.callId, 
-				SipCommandString::incoming_available, 
-				     getMediaSession()->getPeerUri(),
-				(getMediaSession()->isSecure()?"secure":"unprotected")
-				);
-		getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
-		sendRinging();
+    if(instantTalkInvite) {
+		  CommandString cmdstr(dialogState.callId, 
+				  SipCommandString::instant_incoming_available, 
+				      rclList->getString(),
+				  (getMediaSession()->isSecure()?"secure":"unprotected")
+				  );
+		  getSipStack()->getCallback()->handleCommand("gui", cmdstr );
+
+		  sendRinging();
+		
+    } else {
+  		CommandString cmdstr(dialogState.callId, 
+	  			SipCommandString::incoming_available, 
+		  		     getMediaSession()->getPeerUri(),
+			  	(getMediaSession()->isSecure()?"secure":"unprotected")
+				  );
+		  getSipStack()->getCallback()->handleCommand("gui", cmdstr );
+
+		  sendRinging();
+    }
 		
 		if( getSipStack()->getStackConfig()->autoAnswer ){
 			CommandString accept( dialogState.callId, SipCommandString::accept_invite );
@@ -469,7 +482,18 @@ bool SipDialogVoipServer::a3008_100rel_ringing_PRACK( const SipSMCommand &comman
 
 	lastProvisional = NULL;
 	sendPrackOk( prack );
+  if(instantTalkInvite) {
+		  CommandString cmdstr(dialogState.callId, 
+				  SipCommandString::instant_incoming_available, 
+				      rclList->getString(),
+				  (getMediaSession()->isSecure()?"secure":"unprotected")
+				  );
+		  getSipStack()->getCallback()->handleCommand("gui", cmdstr );
+
+		  sendRinging();
+      //instantTalkInvite = false;
 		
+  } else { 	
 	CommandString cmdstr(dialogState.callId, 
 			     SipCommandString::incoming_available, 
 			     getMediaSession()->getPeerUri(),
@@ -478,7 +502,7 @@ bool SipDialogVoipServer::a3008_100rel_ringing_PRACK( const SipSMCommand &comman
 	getSipStack()->getCallback()->handleCommand("gui", cmdstr );
 
 	sendRinging();
-		
+	}
 	return true;
 }
 

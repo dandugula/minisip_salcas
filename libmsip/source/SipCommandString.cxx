@@ -51,6 +51,7 @@ const string SipCommandString::invite="invite";
 const string SipCommandString::invite_ok="invite_ok";
 const string SipCommandString::invite_no_reply="invite_no_reply";
 const string SipCommandString::incoming_available="incoming_available";
+const string SipCommandString::instant_incoming_available="instant_incoming_available";
 const string SipCommandString::remote_hang_up="remote_hang_up";
 const string SipCommandString::remote_ringing="remote_ringing";
 const string SipCommandString::remote_reject="remote_reject";

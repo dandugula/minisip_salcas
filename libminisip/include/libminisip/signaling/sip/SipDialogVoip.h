@@ -40,6 +40,7 @@
 #include<libmsip/SipDialog.h>
 #include<libmsip/SipResponse.h>
 #include<libmutil/StateMachine.h>
+#include<libmsip/SipMessageContentRCL.h>
 
 #include"../../../../source/subsystem_media/Session.h"
 
@@ -80,13 +81,14 @@ class LIBMINISIP_API SipDialogVoip: public SipDialog{
 
 		
 		MRef<Session *> mediaSession;
+    MRef<SipMessageContentRCL *> rclList;
 		
 		/**
 		Used to notify once of the call_terminated_early command.
 		Useful for shutdown and management purposes.
 		*/
 		bool notifyEarlyTermination;
-		
+	  bool instantTalkInvite;	
 		bool useStun;
 	private:
 		

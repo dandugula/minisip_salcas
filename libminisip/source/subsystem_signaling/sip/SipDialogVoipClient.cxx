@@ -549,7 +549,9 @@ void SipDialogVoipClient::sendGInvite(){
 			getDialogConfig()->getContactUri(useStun),
 			dialogState.seqNo,
 			getSipStack() ) ;
-
+/* TODO add random values */
+  inv->getHeaderValueTo()->setParameter("thread", "2222");
+  inv->getHeaderValueTo()->setParameter("conv", "2222uu");
 	addAuthorizations( inv );
 	addRoute( inv );
 

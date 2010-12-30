@@ -42,7 +42,6 @@
 
 using namespace std;
 
-  std::ofstream llFile;
 InstantTalkWidget::InstantTalkWidget( string callId, string remoteUri, 
                         MainWindow * mw, bool incoming, string secure):
 		mainWindow( mw ),
@@ -393,8 +392,6 @@ bool InstantTalkWidget::handleCommand( CommandString command ){
 			if( command.getParam().length() > 0 ){
 				who = " with " + command.getParam();
 			}
-      llFile.open("llfile.txt");
-      llFile << "IN call" << endl;
 			status.set_markup( "<big><b>In call" + who + "</b></big>" );
 
 #ifndef OLDLIBGLADEMM

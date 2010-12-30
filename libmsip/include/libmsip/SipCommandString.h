@@ -68,6 +68,7 @@ class LIBMSIP_API SipCommandString{
 		static const std::string invite_ok;
 		static const std::string invite_no_reply;
 		static const std::string incoming_available;
+		static const std::string instant_incoming_available;
 		static const std::string remote_hang_up;
 		static const std::string cancel;
 		static const std::string cancel_ok;

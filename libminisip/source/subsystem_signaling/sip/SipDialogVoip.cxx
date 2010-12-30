@@ -35,7 +35,6 @@
 #include<libminisip/signaling/sip/SipDialogVoip.h>
 
 #include<libmutil/massert.h>
-
 #include<libmsip/SipTransitionUtils.h>
 #include<libmsip/SipCommandString.h>
 #include<libmsip/SipHeaderWarning.h>
@@ -675,7 +674,8 @@ SipDialogVoip::SipDialogVoip(	MRef<SipStack*> stack,
 		mediaSession(s),
 		notifyEarlyTermination(false),
 		useStun(stun),
-		lastInvite(NULL)
+		lastInvite(NULL),
+    instantTalkInvite(false)
 {
 	/* We will fill that later, once we know if that succeeded */
 	logEntry = NULL;
@@ -826,7 +826,6 @@ MRef<Session *> SipDialogVoip::getMediaSession(){
 void SipDialogVoip::setMediaSession(MRef<Session*> s){
 	mediaSession=s;
 }
-
 bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, int type){
 	if (Offer){
 		if ( Offer->getContentType().substr(0,9) == "multipart"){
@@ -839,9 +838,10 @@ bool SipDialogVoip::sortMIME(MRef<SipMessageContent *> Offer, string peerUri, in
 		}
 
     /* Handle RCL List here */
-    if( (Offer->getContentType()).substr(0, 29) == "application/resource-list+xml") {
+    if( (Offer->getContentType()).substr(0, 30) == "application/resource-lists+xml") {
      /*TODO: parse the packet and send the sip uris to GUI subsystem */
-        std::cerr << "Identified rcl list" << std::endl;
+      instantTalkInvite = true;
+      rclList = dynamic_cast<SipMessageContentRCL*>(*Offer);
     }
 
 		if( (Offer->getContentType()).substr(0,15) == "application/sdp"){
