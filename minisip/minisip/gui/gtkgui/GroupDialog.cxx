@@ -45,8 +45,24 @@ void GroupDialog::hide(){
 void GroupDialog::reset(){
 	
 }
-void GroupDialog::removeGroup(){
-	//groupDialogWidget->show();
+void GroupDialog::removeGroup()
+{
+  int i,groupId;
+  Glib::RefPtr<Gtk::TreeSelection>selectedVal=GroupTreeView->get_selection();
+  Gtk::TreeModel::iterator it = selectedVal->get_selected();
+  string str;
+  it->get_value(0, str);
+  group_details *grp=extractProfileInfo();
+  for(i=0;grp[i].groupName!="";i++)
+  {
+    if(grp[i].groupName==str)
+    { 
+      groupId=grp[i].groupId;
+    }
+  }
+  nebula_deleteGroup(groupId);
+  GroupTreeView->remove_all_columns();
+  setup_tree_view(GroupTreeView->gobj());
 }
 void GroupDialog::addGroup(){
 		

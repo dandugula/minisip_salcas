@@ -40,10 +40,10 @@ return str1;
 
 }
 
+
 int requestProcessing(REST_parameters*rest,wstring request_body,Resp *res)
 {
   
-  //cout<<"inside request processing"<<endl;
   ghttp_request *request = NULL;
   request = ghttp_request_new();
   ghttp_uri_validate((char*)rest->uri.c_str());
@@ -60,7 +60,6 @@ int requestProcessing(REST_parameters*rest,wstring request_body,Resp *res)
   ghttp_prepare(request);
   ghttp_process(request);
   res->result=ghttp_get_body(request);
-  cout<<"the response body(function)"<<endl<<res->result<<endl;
   res->status_code=ghttp_status_code(request);
   cout<<endl<<"response"<<res->status_code<<endl;
   ghttp_request_destroy(request);
@@ -149,28 +148,21 @@ group_details * extractProfileInfo()
     {
 	groups[i].users = 0;
        groups[i].groupName=convertToChar((*pos).first);
-       cout<<endl<<groups[i].groupName<<endl;
        if(pos->second->IsObject()) 
        { 
           JSONObject json_obj2 = pos->second->AsObject();
           groups[i].status=convertToChar(json_obj2[L"status"]->AsString().c_str());
-          cout<<"status is "<<groups[i].status<<endl;
        	  group_id=convertToChar(json_obj2[L"id"]->AsString().c_str());
 	  groups[i].groupId=atoi(group_id);
-          cout<<"group id is "<<groups[i].groupId<<endl;		
-	  JSONObject::iterator iter = json_obj2.begin();
-		int j = 0;
+         JSONObject::iterator iter = json_obj2.begin();
+         int j = 0;
 	  for(; iter != json_obj2.end(); ++iter) 
           {
 
 	     if(iter->second->IsObject()) 
             { 
              JSONObject json_obj3 = iter->second->AsObject();
-	     //JSONObject::iterator iter1 = json_obj3.begin();
-
-		//cout <<"------------------" << (convertToChar(iter1->first)) << "--------------------" << endl;
 	        groups[i].user_profile[j].username=convertToChar(json_obj3[L"username"]->AsString().c_str());
-                cout<<groups[i].user_profile[j].username<<endl;
                 groups[i].user_profile[j].address=convertToChar(json_obj3[L"address"]->AsString().c_str());
                 groups[i].user_profile[j].domain=convertToChar(json_obj3[L"domain"]->AsString().c_str());
                 groups[i].user_profile[j].fullName=convertToChar(json_obj3[L"fullName"]->AsString().c_str());
@@ -194,8 +186,6 @@ group_details * extractProfileInfo()
 
 int nebula_login(credentials*cred1,group_details *grp)
 {
-
-  cout<<"inside nebula login"<<endl;
   cred.cred_username=cred1->cred_username;
   cred.cred_password=cred1->cred_password;
   REST_parameters rest;
@@ -207,7 +197,6 @@ int nebula_login(credentials*cred1,group_details *grp)
     std::cout << "Invalid username / password " << std::endl;
     return 600;
   }
-  //grp=extractProfileInfo(); 
   return 0;
 }
 
@@ -326,6 +315,7 @@ Resp nebula_insertUserIntoGroup(string userName,int groupId)
         cout<<"the result of the adding group is  "<<res.result<<endl;
    }
   }
+  return res;
 }
 
 string intToString(int x)
@@ -339,82 +329,48 @@ string intToString(int x)
 
 }
 
-Resp nebula_deleteContact(profile *user)
+Resp nebula_deleteContact(int userid)
 {
  REST_parameters rest;
- uriCreation(&rest,ghttp_type_delete,"RESTGroups/","/deleteContact/",intToString(user->userId));
+ uriCreation(&rest,ghttp_type_delete,"RESTGroups/","/deleteContact/",intToString(userid));
  request_body=L"";
  Resp res;
- requestProcessing(&rest,request_body,&res);  
+ requestProcessing(&rest,request_body,&res); 
+ return res; 
 }
 
-Resp nebula_deleteGroup(group_details *grp)
+Resp nebula_deleteGroup(int groupid)
 {  
  REST_parameters rest;
- uriCreation(&rest,ghttp_type_delete,"RESTGroups/","/deleteGroup/",intToString(grp->groupId));
+ uriCreation(&rest,ghttp_type_delete,"RESTGroups/","/deleteGroup/",intToString(groupid));
  request_body=L"";
  Resp res;
  requestProcessing(&rest,request_body,&res);
+ return res;
 }
  
-
-void nebula_modifyContact()
+string nebula_getReflectorUri()
 {
- /* cout<<"inside nebula register"<<endl;
-  JSONValue *json_nebula_modifyContact;
-  JSONValue username(convertToWchar(user_profile->username));
-  JSONValue password(convertToWchar(user_profile->password));
-  JSONValue fullName(convertToWchar(user_profile->fullName));
-  JSONValue address(convertToWchar(user_profile->address));
-  JSONValue email_address(convertToWchar(user_profile->email_address));
-  JSONValue phoneNumber(convertToWchar(user_profile->phoneNumber));
-  JSONObject json_modify;
-  json_modify.insert(std::pair<wstring,JSONValue*>(L"username",&username));
-  json_modify.insert(std::pair<wstring,JSONValue*>(L"password",&password));
-  json_modify.insert(std::pair<wstring,JSONValue*>(L"fullName",&fullName));
-  json_modify.insert(std::pair<wstring,JSONValue*>(L"address",&address));
-  json_modify.insert(std::pair<wstring,JSONValue*>(L"email_address",&email_address));
-  json_modify.insert(std::pair<wstring,JSONValue*>(L"phoneNumber",&phoneNumber));
-  printf("inserted\n");
-  json_nebula_modifyContact=new JSONValue(json_modify);
-  json_nebula_modifyContact->AsObject()=json_modify;
-  request_body=json_nebula_modifyContact->Stringify();
-  REST_parameters rest;
-  uriCreation(&rest,ghttp_type_put,"RESTGroups/","modifyContact/","");
-  Resp res; 
-  requestProcessing(&rest,request_body,&res);*/
-
+ REST_parameters rest;
+ uriCreation(&rest,ghttp_type_get,"RESTSystem/","reflectorName/","");
+ request_body=L"";
+ Resp res;
+ requestProcessing(&rest,request_body,&res);
+ JSONValue *json_nebula_reflectorUri;
+ json_nebula_reflectorUri=JSON::Parse(convertToWchar(res.result));
+  if(json_nebula_reflectorUri==NULL)
+  {
+    cout<<"the parsing is not successfull\n";
+  }
+  else if(json_nebula_reflectorUri->IsObject())
+  {
+   JSONObject json_reflectorUri=json_nebula_reflectorUri->AsObject();
+   if(json_reflectorUri.find(L"result") != json_reflectorUri.end() && json_reflectorUri[L"result"]->IsString())
+   {
+	wstring result=(json_reflectorUri[L"result"]->AsString());
+	res.result=convertToChar(result);
+        cout<<"the relector uri is  "<<res.result<<endl;
+   }
+  }
+  return res.result;
 }
-
-
-
-
-/*int main()
-{
-  profile user;
-  
-  user.username="boris";
-  user.password="boris";
-  user.fullName="Boris Ristov";
-  user.address="Kista";
-  user.phoneNumber="0046";
-  user.email_address="ristov@kth.se";
-  user.userId=73;
-  //cout<<"goign to call register";
-  //nebula_register(&user);
-  
-  cred.cred_username="saad";
-  cred.cred_password="saad";
-  nebula_login(&cred);
-  //nebula_addContact("sukru","Sukru Senli");
-  //nebula_retrieveGroups();
-  group_details grp;
-  grp.groupName="SALCAS";
-  grp.status="available";
-  grp.groupId=256;
-   //nebula_addGroup(&grp);
-  //nebula_insertUserIntoGroup(&user,&grp); 
-  //nebula_deleteContact(&user);
-  //nebula_deleteGroup(&grp);  
-}
-*/

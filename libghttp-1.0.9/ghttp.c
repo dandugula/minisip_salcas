@@ -670,8 +670,7 @@ ghttp_set_authinfo(ghttp_request *a_request,
   memset(l_authtoken, 0, (strlen(a_user) + strlen(a_pass) + 2));
   sprintf(l_authtoken, "%s:%s", a_user, a_pass);
   l_auth64 = http_base64_encode(l_authtoken);
-   printf("the 64 encode function called ");
-  if (!l_auth64)
+    if (!l_auth64)
     {
       free(l_authtoken);
       return -1;
@@ -681,7 +680,6 @@ ghttp_set_authinfo(ghttp_request *a_request,
   memset(l_final_auth, 0, (strlen(l_auth64) + strlen(basic_header) + 1));
   strcat(l_final_auth, basic_header);
   strcat(l_final_auth, l_auth64);
-	printf(" the final authorised code is(base 64) %s",l_final_auth);
   free(l_auth64);
   free(l_authtoken);
   /* copy the strings into the request */
@@ -693,7 +691,6 @@ ghttp_set_authinfo(ghttp_request *a_request,
   a_request->password = strdup(a_pass);
   a_request->authtoken = l_final_auth;
 
-printf("the authorisation token is %s",a_request->authtoken);
   return 0;
 }
 

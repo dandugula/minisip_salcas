@@ -14,13 +14,11 @@ void setup_tree_view (GtkTreeView *treeview)
   store=gtk_tree_store_new(COLUMNS,G_TYPE_STRING);
   for(i=0;groups[i].groupName !="";i++)
   {
-      cout<<groups[i].groupName<<endl;
       gtk_tree_store_append (store, &iter, NULL);
       gtk_tree_store_set(store,&iter,Groups,groups[i].groupName.c_str(),-1);      
       j=0;
       while(j<groups[i].users)
        {
-           cout<<groups[i].user_profile[j].username.c_str()<<endl;
             gtk_tree_store_append (store, &child, &iter);
             gtk_tree_store_set(store,&child,Groups,groups[i].user_profile[j].username.c_str(),-1);      
 	j++;	 

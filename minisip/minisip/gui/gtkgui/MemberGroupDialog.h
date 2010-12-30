@@ -39,12 +39,13 @@ class MemberGroupDialog
 		Gtk::Entry * nebulanameEntry;
 		Gtk::Label * nebulanameLabel;
 		Gtk::ComboBox * selectgroupList;
-                 GtkComboBox *groupList;
+                
 		Gtk::Label * selectgroupLabel;
 				
 		Gtk::Button * addmemberButton;
 		Gtk::Button * resetButton;
                 Gtk::TreeView *GroupTreeView;
                 int groupId;
+                int combo_items;
 };
 #endif

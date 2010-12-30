@@ -63,7 +63,8 @@ int nebula_login(credentials*cred1,group_details *grp);
 Resp nebula_addContact(string contactName,string nickName);
 Resp nebula_addGroup(group_details *grp);
 Resp nebula_insertUserIntoGroup(string username,int groupId);
-Resp nebula_deleteContact(profile *user);
-Resp nebula_deleteGroup(group_details *grp);
+Resp nebula_deleteContact(int userid);
+Resp nebula_deleteGroup(int groupid);
 group_details * extractProfileInfo();
+string nebula_getReflectorUri();
 
