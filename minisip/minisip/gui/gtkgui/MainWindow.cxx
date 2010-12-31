@@ -978,7 +978,8 @@ void MainWindow::instanttalkClick(){
         Gtk::TreeModel::iterator it = selectedVal->get_selected();
         string str;
         //Remove hard coded reflector uri
-        string gcall = "plm";
+        string mcu = nebula_getReflectorUri();
+        string gcall = mcu;
         it->get_value(0, str);
         Gtk::TreeNodeChildren::iterator itc = it->children().begin();
         while(itc != it->children().end()) {
@@ -997,7 +998,7 @@ void MainWindow::instanttalkClick(){
 			  dialog.show();
 		  }
 
-		addInstantCall( id, "mcu9", false );
+		addInstantCall( id, mcu, false );
 		//addCall( id, "mcu9", false );
  	//sukru fill here
 }
