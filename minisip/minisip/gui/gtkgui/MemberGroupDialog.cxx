@@ -103,7 +103,7 @@ GtkComboBox * groupList;
  //groupList=gtk_combo_box_new_text();
  
 
- groupList=selectgroupList->;
+ groupList=selectgroupList->gobj();
   group_details *grp=extractProfileInfo();
  
  //gtk_list_store_clear (GTK_LIST_STORE (gtk_combo_box_get_model (groupList)));

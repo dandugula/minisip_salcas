@@ -38,7 +38,7 @@
 
 
 extern "C"{
-#include<video_codec.h>
+#include"VideoCodec.h"
 //#include<avcodec.h>
 }
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
@@ -46,7 +46,7 @@ extern "C"{
 typedef uint8_t byte_t;
 
 class VideoEncoderCallback;
-//struct Video;
+struct Video;
 
 class LIBMINISIP_API AVEncoder: public ImageHandler, public MObject{
 	public:
