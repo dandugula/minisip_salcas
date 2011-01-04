@@ -25,7 +25,6 @@ void setup_tree_view (GtkTreeView *treeview)
         }
                   
   }
-    
   gtk_tree_view_set_model (treeview, GTK_TREE_MODEL (store));
   gtk_tree_view_expand_all (treeview);
   gtk_widget_show(GTK_WIDGET(treeview));

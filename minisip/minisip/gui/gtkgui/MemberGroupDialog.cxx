@@ -26,20 +26,17 @@ MemberGroupDialog::MemberGroupDialog( Glib::RefPtr<Gnome::Glade::Xml> theRefXml)
 	refXml->get_widget( "nebulanameEntry", nebulanameEntry );
 	refXml->get_widget( "nebulanameLabel", nebulanameLabel );
 	refXml->get_widget( "selectgroupList", selectgroupList );
-	refXml->get_widget( "selectgroupLabel", selectgroupLabel );
+        refXml->get_widget( "selectgroupLabel", selectgroupLabel );
 	refXml->get_widget( "addmemberButton", addmemberButton );
 	refXml->get_widget( "resetButton", resetButton );
         refXml->get_widget("treeView1",GroupTreeView);
 	
-       
-
-	addmemberButton->signal_clicked().connect( SLOT( *this, &MemberGroupDialog::addMember));
+ 	addmemberButton->signal_clicked().connect( SLOT( *this, &MemberGroupDialog::addMember));
 	resetButton->signal_clicked().connect( SLOT( *this, &MemberGroupDialog::reset));
         
 	selectgroupList->signal_changed().connect(SLOT( *this, &MemberGroupDialog::groupListSelect));
 	membergroupDialogWidget->hide();
-        combo_items=0;
-
+        
 }
 
 MemberGroupDialog::~MemberGroupDialog(){
@@ -61,7 +58,6 @@ void MemberGroupDialog::addMember()
       hide();
       GroupTreeView->remove_all_columns();
       setup_tree_view(GroupTreeView->gobj());
-      
       
 }
           
@@ -98,33 +94,33 @@ void MemberGroupDialog::removeMemberGroup()
 
 void MemberGroupDialog::updateGroupList()
 { 
-  int i;
-GtkComboBox * groupList;
- //groupList=gtk_combo_box_new_text();
- 
-
- groupList=selectgroupList->gobj();
-  group_details *grp=extractProfileInfo();
- 
- //gtk_list_store_clear (GTK_LIST_STORE (gtk_combo_box_get_model (groupList)));
-   for(i=0;grp[i].groupName!="";i++)
+   GtkComboBox * groupList;
+   group_details *groups=extractProfileInfo();
+   GtkCellRenderer *renderer;
+   GtkTreeViewColumn *column;
+   renderer = gtk_cell_renderer_text_new ();
+   column = gtk_tree_view_column_new_with_attributes("Groups", renderer,"text",Groups,NULL);
+   GtkTreeStore *store;
+   GtkTreeIter iter;
+   guint i;
+   store=gtk_tree_store_new(COLUMNS,G_TYPE_STRING);
+   for(i=0;groups[i].groupName !="";i++)
    {
-     cout<<"inside for for the "<<i<<"time"<<endl;
-     cout<<"removing group "<<grp[i].groupName<<endl;
-     //gtk_combo_box_remove_text(groupList,i);   
-   }
-  for (i=0,combo_items=0;grp[i].groupName !="";i++)
-  {
-    gtk_combo_box_insert_text(groupList,i,grp[i].groupName.c_str());
-    ++combo_items;
-  }
+      gtk_tree_store_append (store, &iter, NULL);
+      gtk_tree_store_set(store,&iter,Groups,groups[i].groupName.c_str(),-1); 
+   }     
+   gtk_combo_box_set_model(selectgroupList->gobj(),GTK_TREE_MODEL(store));
+  
+  
 }
 
 
 void MemberGroupDialog::groupListSelect()
 {
  int group_id,i;
- char * str=gtk_combo_box_get_active_text(selectgroupList->gobj());
+ string str;
+ Gtk::TreeModel::iterator it = selectgroupList->get_active();
+ it->get_value(0,str);
  group_details *grp=extractProfileInfo();
  for (i=0;grp[i].groupName!="";i++)
  {
@@ -133,7 +129,6 @@ void MemberGroupDialog::groupListSelect()
  }
   groupId=group_id;
 }
-
 
 
 void MemberGroupDialog::reset()
