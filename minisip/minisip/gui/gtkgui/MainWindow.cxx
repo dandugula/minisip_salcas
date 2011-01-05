@@ -90,9 +90,6 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	Gtk::Button * imButton;
 	Gtk::Button * instanttalkButton;
 	Gtk::Button * signoutButton;	
-	Gtk::ToggleButton * itButton;
-	Gtk::ToggleButton * stepinButton;//
-	Gtk::ToggleButton * stepoutButton;//
 	Gtk::MenuItem * prefMenu;
 	Gtk::MenuItem * certMenu;
 	Gtk::MenuItem * quitMenu;
@@ -103,7 +100,6 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	Gtk::MenuItem * addGroupMenu;
 	Gtk::MenuItem * removeGroupMenu;
 	Gtk::MenuItem * addContactGroupMenu;
-	Gtk::MenuItem * editContactGroupMenu;
 	Gtk::MenuItem * removeContactGroupMenu;
 	Gtk::MenuItem * callMenu;
 	Gtk::MenuItem * conferenceMenu;
@@ -151,8 +147,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	refXml->get_widget( "removeGroupMenu", removeGroupMenu );
 	refXml->get_widget( "addContactGroupMenu", addContactGroupMenu );
 	refXml->get_widget( "removeContactGroupMenu", removeContactGroupMenu );
-	refXml->get_widget( "editContactGroupMenu", editContactGroupMenu );
-
+	
 	refXml->get_widget( "callMenu", callMenu );
 	refXml->get_widget( "conferenceMenu", conferenceMenu );
 	refXml->get_widget( "imMenu", imMenu );
@@ -290,8 +285,6 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 		SLOT( *groupDialog, &GroupDialog::removeGroup ));
 	addContactGroupMenu->signal_activate().connect(
 		SLOT( *membergroupDialog, &MemberGroupDialog::show ));
-	editContactGroupMenu->signal_activate(). connect(
-		SLOT( *membergroupDialog, &MemberGroupDialog:: editMemberGroup));
 	removeContactGroupMenu->signal_activate(). connect(
 		SLOT( *membergroupDialog, &MemberGroupDialog:: removeMemberGroup));
 		
@@ -325,18 +318,7 @@ MainWindow::MainWindow( Gtk::Main *main, std::string programDir ):kit( main ){
 	
 	signoutButton->signal_clicked().connect( SLOT( *this, &MainWindow::quit ) );
 
-	refXml->get_widget( "itButton", itButton );
-
-	itButton->signal_toggled().connect( SLOT( *this, &MainWindow::instanttalkClick ) );
-
-	refXml->get_widget( "stepinButton", stepinButton );
-
-	stepinButton->signal_toggled().connect( SLOT( *this, &MainWindow::unmuteInstanttalk ) );
-	
-	refXml->get_widget( "stepoutButton", stepoutButton );
-
-	stepoutButton->signal_toggled().connect( SLOT( *this, &MainWindow::muteInstanttalk ) );//
-#ifdef HAVE_LIBGLADEMM_2_
+	#ifdef HAVE_LIBGLADEMM_2_
 	aboutMenu->signal_activate().connect( SLOT( *this, &MainWindow::aboutClick ) );
 #else
 	aboutMenu->set_sensitive( false );

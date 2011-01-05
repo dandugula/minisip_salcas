@@ -1722,59 +1722,6 @@ Example:
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkRadioMenuItem" id="Group">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Nebula Menu</property>
-                        <property name="use_underline">True</property>
-                        <property name="draw_as_radio">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="Groupseparator">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="addGroupMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Add a Group</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="removeGroupMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Remove Group</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="addContactGroupMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Add a contact</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="editContactGroupMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Edit Contact</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkMenuItem" id="removeContactGroupMenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Remove contact</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkSeparatorMenuItem" id="groupseparator">
-                        <property name="visible">True</property>
-                      </widget>
-                    </child>
-                    <child>
                       <widget class="GtkMenuItem" id="callMenu">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Call</property>
@@ -1793,6 +1740,44 @@ Example:
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Instant Message</property>
                         <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="menuitem2">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="addGroupMenu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Nebula Add Group</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="removeGroupMenu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Nebula Remove Group</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="addContactGroupMenu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Nebula Add Contact</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="removeContactGroupMenu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Nebula Remove contact</property>
+                        <property name="use_underline">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="menuitem1">
+                        <property name="visible">True</property>
                       </widget>
                     </child>
                   </widget>
@@ -2034,15 +2019,32 @@ Example:
                     <property name="visible">True</property>
                     <property name="homogeneous">True</property>
                     <child>
-                      <widget class="GtkLabel" id="nebnameLabel">
+                      <widget class="GtkToolbar" id="toolbar2">
                         <property name="visible">True</property>
+                        <child>
+                          <widget class="GtkToolButton" id="toolbutton2">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">toolbutton2</property>
+                            <property name="use_underline">True</property>
+                            <property name="icon">neb.png</property>
+                          </widget>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="homogeneous">True</property>
+                          </packing>
+                        </child>
                       </widget>
                       <packing>
                         <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <widget class="GtkLabel" id="nebnameLabel">
+                        <property name="visible">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                     <child>
                       <widget class="GtkButton" id="signoutButton">
@@ -2121,84 +2123,6 @@ Example:
               </widget>
               <packing>
                 <property name="position">1</property>
-                <property name="tab_fill">False</property>
-                <property name="type">tab</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkVBox" id="conversationVbox">
-                <property name="visible">True</property>
-                <child>
-                  <widget class="GtkScrolledWindow" id="scrolledwindow3">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">automatic</property>
-                    <property name="vscrollbar_policy">automatic</property>
-                    <child>
-                      <widget class="GtkTreeView" id="treeview2">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                      </widget>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkHBox" id="hbox23">
-                    <property name="visible">True</property>
-                    <child>
-                      <widget class="GtkToggleButton" id="itButton">
-                        <property name="label" translatable="yes">Instant Talk</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkToggleButton" id="stepinButton">
-                        <property name="label" translatable="yes">Step In</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkToggleButton" id="stepoutButton">
-                        <property name="label" translatable="yes">Step Out</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-              </widget>
-              <packing>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="gc_Conversations">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Conversations</property>
-              </widget>
-              <packing>
-                <property name="position">2</property>
                 <property name="tab_fill">False</property>
                 <property name="type">tab</property>
               </packing>
@@ -3652,12 +3576,23 @@ Example:
       <widget class="GtkVBox" id="vbox3">
         <property name="visible">True</property>
         <child>
-          <widget class="GtkLabel" id="label6">
+          <widget class="GtkToolbar" id="toolbar3">
             <property name="visible">True</property>
-            <property name="label" translatable="yes">Nebula</property>
-            <property name="wrap">True</property>
+            <child>
+              <widget class="GtkToolButton" id="toolbutton3">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">toolbutton3</property>
+                <property name="use_underline">True</property>
+                <property name="icon">neb.png</property>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
           </widget>
           <packing>
+            <property name="expand">False</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -3899,8 +3834,20 @@ Example:
       <widget class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
         <child>
-          <widget class="GtkHSeparator" id="hseparator1">
+          <widget class="GtkToolbar" id="toolbar6">
             <property name="visible">True</property>
+            <child>
+              <widget class="GtkToolButton" id="toolbutton6">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">toolbutton6</property>
+                <property name="use_underline">True</property>
+                <property name="icon">neb.png</property>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="expand">False</property>
@@ -3908,10 +3855,13 @@ Example:
           </packing>
         </child>
         <child>
-          <widget class="GtkDrawingArea" id="drawingarea1">
+          <widget class="GtkStatusbar" id="statusbar2">
+            <property name="height_request">1</property>
             <property name="visible">True</property>
+            <property name="spacing">2</property>
           </widget>
           <packing>
+            <property name="expand">False</property>
             <property name="position">1</property>
           </packing>
         </child>
@@ -3981,7 +3931,7 @@ Example:
             </child>
           </widget>
           <packing>
-            <property name="position">4</property>
+            <property name="position">5</property>
           </packing>
         </child>
         <child>
@@ -4003,7 +3953,7 @@ Example:
     Click Create Account</property>
           </widget>
           <packing>
-            <property name="position">6</property>
+            <property name="position">7</property>
           </packing>
         </child>
         <child>
@@ -4027,10 +3977,20 @@ Example:
       <widget class="GtkVBox" id="vbox16">
         <property name="visible">True</property>
         <child>
-          <widget class="GtkLabel" id="label15">
+          <widget class="GtkToolbar" id="toolbar4">
             <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Nebula</property>
+            <child>
+              <widget class="GtkToolButton" id="toolbutton4">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">toolbutton4</property>
+                <property name="use_underline">True</property>
+                <property name="icon">neb.png</property>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="expand">False</property>
@@ -4049,7 +4009,6 @@ Example:
         <child>
           <widget class="GtkLabel" id="label17">
             <property name="visible">True</property>
-            <property name="xalign">0</property>
             <property name="ypad">14</property>
             <property name="label" translatable="yes">Add Group</property>
           </widget>
@@ -4139,10 +4098,20 @@ Example:
         <property name="visible">True</property>
         <property name="spacing">12</property>
         <child>
-          <widget class="GtkLabel" id="label18">
+          <widget class="GtkToolbar" id="toolbar1">
             <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Nebula</property>
+            <child>
+              <widget class="GtkToolButton" id="toolbutton1">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">toolbutton1</property>
+                <property name="use_underline">True</property>
+                <property name="icon">neb.png</property>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="expand">False</property>
@@ -4161,7 +4130,6 @@ Example:
         <child>
           <widget class="GtkLabel" id="label19">
             <property name="visible">True</property>
-            <property name="xalign">0</property>
             <property name="label" translatable="yes">Add contact</property>
           </widget>
           <packing>
@@ -4300,10 +4268,20 @@ Example:
         <property name="visible">True</property>
         <property name="spacing">12</property>
         <child>
-          <widget class="GtkLabel" id="label23">
+          <widget class="GtkToolbar" id="toolbar5">
             <property name="visible">True</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Nebula</property>
+            <child>
+              <widget class="GtkToolButton" id="toolbutton5">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">toolbutton5</property>
+                <property name="use_underline">True</property>
+                <property name="icon">neb.png</property>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="expand">False</property>
@@ -4322,7 +4300,6 @@ Example:
         <child>
           <widget class="GtkLabel" id="label24">
             <property name="visible">True</property>
-            <property name="xalign">0</property>
             <property name="label" translatable="yes">Edit contact</property>
           </widget>
           <packing>
