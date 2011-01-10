@@ -550,8 +550,21 @@ void SipDialogVoipClient::sendGInvite(){
 			dialogState.seqNo,
 			getSipStack() ) ;
 /* TODO add random values */
-  inv->getHeaderValueTo()->setParameter("thread", "2222");
-  inv->getHeaderValueTo()->setParameter("conv", "2222uu");
+  char s[10], t[10];
+  int len = 6;
+  static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    for (int i = 0; i < len; ++i) {
+        s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+        t[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+
+    s[len] = 0; t[len] = 0;
+  inv->getHeaderValueTo()->setParameter("thread", s);
+  inv->getHeaderValueTo()->setParameter("conv", t);
 	addAuthorizations( inv );
 	addRoute( inv );
 
